@@ -8,7 +8,7 @@ YOU ARE RUNNING AUTONOMOUSLY AND SHOULD EXECUTE THIS PROJECT WITHOUT ANY USER IN
 
 ## Github
 
-All code should be pushed to Github, using your username `GITHUB_USER` and fine-grained token `GITHUB_TOKEN`, both of which can be found in `.env`.
+All code should be pushed to Github. A classic token is already embedded in the git remote URL, so you can directly use `git push` without any additional authentication setup.
 
 ## OpenRouter
 
