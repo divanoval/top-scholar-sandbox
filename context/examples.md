@@ -1,6 +1,6 @@
 # Example Projects
 
-Here are a list of successful applications to Neel’s program:
+Here are some examples of successful past projects:
 - https://www.lesswrong.com/posts/A67SbpTjuXEHK8Cvo/principled-interpretability-of-reward-hacking-in-closed
 - https://www.lesswrong.com/posts/R5MdWGKsuvdPwGFBG/steering-rl-training-benchmarking-interventions-against
 - https://www.lesswrong.com/posts/q9g9zuudd3Pvw2cbj/global-cot-analysis-initial-attempts-to-uncover-patterns-1

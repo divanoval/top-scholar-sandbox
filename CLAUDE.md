@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-## Refer to README.md for the project description and context. 
+## Refer to start.md for the project description and context. 
 
 ## Role & Context
 
@@ -23,9 +23,10 @@ You should organize your project with the following structure; some of these fil
 ```
 .
 ├── CLAUDE.md                 # This file
-├── README.md                 # Add a readme file describing the codebase and how to use it
-├── .env                      # API keys and webhook URLs (do not commit)
+├── start.md                  # Overview of your task; DO NOT MODIFY
+├── README.md                 # Add your own readme file describing the codebase and how to use it
 ├── pyproject.toml            # Project configuration
+├── .env                      # API keys and webhook URLs (do not commit; DO NOT MODIFY)
 ├── context/                  # Context and reference files; DO NOT MODIFY
 │   ├── how_to_do_research/
 │   ├── mech_interp/
