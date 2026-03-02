@@ -1,0 +1,2104 @@
+Directory Structure:
+
+└── ./
+    ├── docs
+    │   ├── source
+    │   │   ├── documentation
+    │   │   │   ├── intervention.rst
+    │   │   │   ├── modeling.rst
+    │   │   │   ├── schema.rst
+    │   │   │   ├── tracing.rst
+    │   │   │   └── util.rst
+    │   │   ├── about.rst
+    │   │   ├── documentation.rst
+    │   │   ├── features.rst
+    │   │   ├── index.rst
+    │   │   ├── start.rst
+    │   │   ├── status.rst
+    │   │   └── tutorials.rst
+    │   ├── sourcelatex
+    │   │   ├── documentation
+    │   │   │   ├── contexts.rst
+    │   │   │   ├── intervention.rst
+    │   │   │   ├── models.rst
+    │   │   │   ├── module.rst
+    │   │   │   ├── patching.rst
+    │   │   │   ├── tracing.rst
+    │   │   │   └── util.rst
+    │   │   └── index.rst
+    │   └── contributing.md
+    ├── CHANGELOG.md
+    ├── CODE_OF_CONDUCT.md
+    └── README.md
+
+
+
+---
+File: /docs/source/documentation/intervention.rst
+---
+
+nnsight.intervention
+--------------------
+
+.. automodule:: nnsight.intervention
+   :members:
+
+.. automodule:: nnsight.intervention.protocols
+   :members:
+
+.. automodule:: nnsight.intervention.protocols.entrypoint
+   :members:
+
+.. automodule:: nnsight.intervention.protocols.grad
+   :members:
+
+.. automodule:: nnsight.intervention.protocols.intervention
+   :members:
+
+.. automodule:: nnsight.intervention.protocols.module
+   :members:
+
+.. automodule:: nnsight.intervention.protocols.swap
+   :members:
+
+.. automodule:: nnsight.intervention.contexts
+   :members:
+
+.. automodule:: nnsight.intervention.contexts.editing
+   :members:
+
+.. automodule:: nnsight.intervention.contexts.globals
+   :members:
+
+.. automodule:: nnsight.intervention.contexts.interleaving
+   :members:
+
+.. automodule:: nnsight.intervention.contexts.invoker
+   :members:
+
+.. automodule:: nnsight.intervention.contexts.local
+   :members:
+
+.. automodule:: nnsight.intervention.contexts.session
+   :members:
+
+.. automodule:: nnsight.intervention.contexts.tracer
+   :members:
+
+.. automodule:: nnsight.intervention.backends
+   :members:
+
+.. automodule:: nnsight.intervention.backends.editing
+   :members:
+
+.. automodule:: nnsight.intervention.backends.remote
+   :members:
+
+.. automodule:: nnsight.intervention.graph
+   :members:
+
+.. automodule:: nnsight.intervention.graph.graph
+   :members:
+
+.. automodule:: nnsight.intervention.graph.node
+   :members:
+
+.. automodule:: nnsight.intervention.graph.proxy
+   :members:
+
+.. automodule:: nnsight.intervention.base
+   :members:
+
+.. automodule:: nnsight.intervention.envoy
+   :members:
+
+.. automodule:: nnsight.intervention.interleaver
+   :members:
+
+
+---
+File: /docs/source/documentation/modeling.rst
+---
+
+nnsight.modeling
+----------------
+
+
+.. automodule:: nnsight.modeling
+   :members:
+
+.. automodule:: nnsight.modeling.language
+   :members:
+
+.. automodule:: nnsight.modeling.diffusion
+   :members:
+
+.. automodule:: nnsight.modeling.vllm.vllm
+   :members:
+
+.. automodule:: nnsight.modeling.vllm.sampling
+   :members:
+
+
+
+
+---
+File: /docs/source/documentation/schema.rst
+---
+
+nnsight.schema
+---------------
+
+.. automodule:: nnsight.schema
+   :members:
+
+.. automodule:: nnsight.schema.Config
+   :members:
+
+.. automodule:: nnsight.schema.Request
+   :members:
+
+.. automodule:: nnsight.schema.Response
+   :members:
+
+.. automodule:: nnsight.schema.format.functions
+   :members:
+
+.. automodule:: nnsight.schema.format.types
+   :members:
+
+
+
+
+
+---
+File: /docs/source/documentation/tracing.rst
+---
+
+nnsight.tracing
+---------------
+
+.. automodule:: nnsight.tracing
+   :members:
+
+.. automodule:: nnsight.tracing.graph.graph
+   :members:
+
+.. automodule:: nnsight.tracing.graph.node
+   :members:
+
+.. automodule:: nnsight.tracing.graph.proxy
+   :members:
+
+.. automodule:: nnsight.tracing.protocols.base
+   :members:
+
+.. automodule:: nnsight.tracing.protocols.lock
+   :members:
+
+.. automodule:: nnsight.tracing.protocols.stop
+   :members:
+
+.. automodule:: nnsight.tracing.protocols.variable
+   :members:
+
+.. automodule:: nnsight.tracing.contexts.base
+   :members:
+
+.. automodule:: nnsight.tracing.contexts.conditional
+   :members:
+
+.. automodule:: nnsight.tracing.contexts.globals
+   :members:
+
+.. automodule:: nnsight.tracing.contexts.iterator
+   :members:
+
+.. automodule:: nnsight.tracing.contexts.tracer
+   :members:
+
+
+---
+File: /docs/source/documentation/util.rst
+---
+
+nnsight.util
+------------
+
+
+.. automodule:: nnsight.util
+   :members:
+
+
+---
+File: /docs/source/about.rst
+---
+
+.. raw:: html
+
+    <style>
+        .accordion-header {
+            margin: 0 !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('figure.align-default').forEach(el => {
+                el.style.marginBottom = "0px";
+            });
+        });
+    </script>
+
+About NNsight
+=============
+
+An API for transparent science on black-box AI.
+-----------------------------------------------
+
+.. card:: How can you study the internals of a deep network that is too large for you to run?
+
+    In this era of large-scale deep learning, the most interesting AI models are massive black boxes
+    that are hard to run. Ordinary commercial inference service APIs let you interact with huge
+    models, but they do not let you see model internals.
+
+    The NNsight library is different: it gives you full access to all the neural network internals.
+    When used together with a remote service like the `National Deep Inference Fabric <https://ndif.us/>`_ (NDIF),
+    it lets you run experiments on huge open models easily, with full transparent access. 
+    NNsight is also terrific for studying smaller local models.
+
+.. figure:: _static/images/interleaved.png
+
+
+.. card::
+    
+    An overview of the NNsight/NDIF pipeline. Researchers write simple Python code to run along with the neural network locally or remotely. Unlike commercial inference, the experiment code can read or write any of the internal states of the neural networks being studied.  This code creates a computation graph that can be sent to the remote service and interleaved with the execution of the neural network.
+
+How do I use NNsight?
+---------------------
+
+NNsight is built on PyTorch.
+
+Running inference on a huge remote model with NNsight is very similar to running a neural network locally on your own workstation.  In fact, with NNsight, the same code for running experiments locally on small models can also be used on large models just by changing a few arguments.
+
+The difference between NNsight and normal inference is that when you use NNsight, you do not treat the model as an opaque black box.
+Instead, you set up a Python ``with`` context that enables you to get direct access to model internals while the neural network runs.
+Here is how it looks:
+
+.. code-block:: python
+    :linenos:
+
+    from nnsight import LanguageModel
+    model = LanguageModel('meta-llama/Meta-Llama-3.1-70B')
+    with model.trace('The Eiffel Tower is in the city of ', remote=True):
+        hidden_state = model.layers[10].input[0].save()  # save one hidden state
+        model.layers[11].mlp.output = 0  # change one MLP module output
+        output = model.output.save() # save model output
+    print('The model predicts', output)
+    print('The internal state was', hidden_state)
+
+The library is easy to use. Any HuggingFace language model can be loaded into a ``LanguageModel`` object, as you can see on line 2.  
+Notice we are loading a 70-billion parameter model, which is ordinarily pretty difficult to load on a regular workstation since it would take 140-280 gigabytes of GPU RAM just to store the parameters. 
+
+The trick that lets us work with this huge model is on line 3.  We set the flag ``remote=True`` to indicate that we want to actually run the network on the remote service. 
+By default the remote service will be NDIF.  If we want to just run a smaller model locally on our machine, we could leave it as ``remote=False``.
+
+Then when we trace and invoke the model on line 3, we do not just call it as a function. Instead, we access it using a ``with`` context manager. 
+This allows NNsight to open up black box neural network models, providing direct access to model internals.
+
+You can see what simple direct access looks like on lines 4-6. 
+On line 4, we grab a hidden state at layer 10, and on line 5, we change the output of an MLP module inside the transformer at layer 11.
+
+When you run this ``with``-block code on lines 3 through 6 on your local workstation, it creates a computation graph storing all your requested calculations on the model.  
+When the ``with`` block is completed, all the defined calculations are sent to the remote server and executed there. 
+Then when model execution is completed, saved results can be accessed on your local workstation, as shown on line 7 and 8.
+
+What happens behind the scenes?
+-------------------------------
+When using NNsight, it is helpful to understand that the operations are not executed immediately but instead adds to an intervention graph that is executed alongside the model's computation graph upon exit of the with block.
+
+An example of one such intervention graph can be seen below:
+
+.. figure:: _static/images/execution.png
+
+.. card::
+    
+    An example of an intervention graph. Operations in research code create nodes in the graph which depend on module inputs and outputs as well as other nodes. Then, this intervention graph is interleaved with the normal computation graph of the chosen model, and requested inputs and outputs are injected into the intervention graph for execution. 
+
+Basic access to model internals can give you a lot of insight about what is going on inside a large model as it runs.  For example, you can use the `logit lens <https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens>`_ to read internal hidden states as text.  
+And use can use `causal tracing <https://rome.baulab.info/>`_ or `path patching <https://arxiv.org/abs/2304.05969>`_ or `other circuit discovery methods <https://arxiv.org/abs/2310.10348>`_ to locate the layers and components within the network that play a decisive role in making a decision.
+
+And with NNsight, you can use these methods on large models like Llama-3.1-70b or Llama-3.1-405b.
+
+The NNsight library also provides full access to gradients and optimization methods, out of order module applications, cross prompt interventions, and many more features.
+
+Next Steps
+----------
+
+See the :doc:`start` and :doc:`features` pages for more information on NNsight's functionality.
+
+Join our forum https://discuss.ndif.us/ for updates, feature requests, bug reports, and opportunities to help with our efforts. 
+If you'd like to report an issue or give our project a star, check out our GitHub: https://github.com/ndif-team/nnsight. 
+We also welcome you to join the `NDIF Discord <https://discord.gg/6uFJmCSwW7>`_ for real-time discussions and community support.
+
+
+
+---
+File: /docs/source/documentation.rst
+---
+
+Documentation
+=============
+
+.. toctree::
+   :titlesonly:
+
+   documentation/modeling
+   documentation/tracing
+   documentation/intervention
+   documentation/schema
+   documentation/util
+
+
+Report Issues
+-------------
+
+NNsight and NDIF are open-source and you can report issues, read, and clone the full source at https://github.com/ndif-team/nnsight. 
+Also check out https://discuss.ndif.us/ for debugging any issues and discussing features.
+
+
+---
+File: /docs/source/features.rst
+---
+
+Features
+=========
+
+.. raw:: html
+
+   <script>
+   document.addEventListener('DOMContentLoaded', (event) => {
+      document.querySelectorAll('h5.card-title').forEach(el => {
+      el.style.margin = '0';
+      });
+   });
+   </script>
+
+   <style>
+      .toctree-wrapper {
+         display: none !important;
+      }
+      h5 {
+         margin-top: 0 !important;
+      }
+   </style>
+
+.. grid:: 1 1 2 2
+   :gutter: 3
+
+   .. grid-item-card:: 
+      :link: notebooks/features/getting.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-wrench fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Getting</h5>
+               <p class="card-text">Access values</p>
+            </div>
+         </div>
+
+   .. grid-item-card::
+      :link: notebooks/features/setting.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-code-pull-request fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Setting</h5>
+               <p class="card-text">Intervene on values</p>
+            </div>
+         </div>
+
+   .. grid-item-card::
+      :link: notebooks/features/scan_validate.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-binoculars fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Scan and Validate</h5>
+               <p class="card-text">Debug tensor shapes</p>
+            </div>
+         </div>
+
+
+   .. grid-item-card:: 
+      :link: notebooks/features/operations.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-glasses fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Operations</h5>
+               <p class="card-text">Edit values</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/modules.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-cubes fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Modules</h5>
+               <p class="card-text">Apply modules</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/custom_functions.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-atom fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Custom Functions</h5>
+               <p class="card-text">Add thing to the Intervention Graph</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/gradients.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-backward fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Gradients</h5>
+               <p class="card-text">Intervene on gradients</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/early_stopping.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-circle-stop fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Early Stopping</h5>
+               <p class="card-text">Save computation time</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/conditionals.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-code-branch fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Conditional Interventions</h5>
+               <p class="card-text">Use If Needed</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/cross_prompt.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-shuffle fa-2x"></i>
+            </div>
+            <div>
+               <h5 class="card-title">Cross Prompts</h5>
+               <p class="card-text">Edit in one pass</p>
+            </div>
+         </div>
+   
+   .. grid-item-card:: 
+      :link: notebooks/features/multiple_token.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-gears fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Generation</h5>
+               <p class="card-text">Generate multiple tokens</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/model_editing.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-pen-to-square fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Model Editing</h5>
+               <p class="card-text">Add persistent interventions</p>
+            </div>
+         </div>
+
+
+   .. grid-item-card:: 
+      :link: notebooks/features/remote_execution.ipynb
+      :class-card: surface
+      :class-body: surface
+
+   
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-satellite-dish fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Remote Execution</h5>
+               <p class="card-text">Use our servers</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/sessions.ipynb
+      :class-card: surface
+      :class-body: surface
+
+   
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-bars fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Sessions</h5>
+               <p class="card-text">Do many traces in one request</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/streaming.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-paper-plane fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Streaming</h5>
+               <p class="card-text">Send remote values to local</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/iterator.ipynb
+      :class-card: surface
+      :class-body: surface
+
+   
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-arrow-rotate-left fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Iterative Interventions</h5>
+               <p class="card-text">Make loops</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/lora_training.ipynb
+      :class-card: surface
+      :class-body: surface
+
+   
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-tower-broadcast fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">LORA</h5>
+               <p class="card-text">Train one</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/features/vllm_support.ipynb
+      :class-card: surface
+      :class-body: surface
+
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-stopwatch fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">vLLM Support</h5>
+               <p class="card-text">Fast inference</p>
+            </div>
+         </div>
+   
+
+Report Issues
+-------------
+
+NNsight and NDIF are open-source and you can report issues, read, and clone the full source at https://github.com/ndif-team/nnsight. 
+Also check out https://discuss.ndif.us/ to ask questions about our features or suggest new ones.
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+   
+   notebooks/features/*
+
+
+
+
+---
+File: /docs/source/index.rst
+---
+
+:html_theme.sidebar_secondary.remove:
+:sd_hide_title:
+
+nnsight
+=======
+
+.. toctree::
+  :maxdepth: 1
+  :hidden:
+
+  start
+  documentation
+  features
+  tutorials
+  About <about>
+
+.. raw:: html
+   :file: pages/home.html
+
+
+---
+File: /docs/source/start.rst
+---
+
+Getting Started
+===============
+
+**NNsight** (/ɛn.saɪt/) is a package for the interpreting and manipulating the internals of deep learning models.
+
+.. _installation:
+
+Installation
+------------
+
+To get started with NNsight, install it with ``pip``. 
+
+.. code-block:: console
+
+   pip install nnsight
+
+Please give the project a :ndif:`star on Github` to support the project. NNsight is open-source and you can read and clone the full source at https://github.com/ndif-team/nnsight.
+
+Remote Model Access
+-------------------
+
+To remotely access LLMs through NDIF, you must sign up for an NDIF API key.
+
+:bdg-link-primary:`NDIF API Key Registration <https://login.ndif.us/>`
+
+NDIF hosts multiple LLMs, including various sizes of the Llama 3.1 models and DeepSeek-R1 models. 
+All of our models are open for public use, but you need to apply for access to the Llama-3.1-405B models. 
+You can view the full list of hosted models at https://nnsight.net/status/.
+
+If you have a clear research need for Llama-3.1-405B and would like more details about applying for access, 
+please refer to our  `405B pilot program application <https://ndif.us/405b.html>`_.
+
+Access LLM Internals
+--------------------
+
+Now that you have your NDIF API key, you can start exploring LLM internals with NDIF and NNsight. 
+We've put together a Colab notebook to help you get started.
+
+:bdg-link-primary:`Open Colab <https://colab.research.google.com/github/ndif-team/ndif-website/blob/onboarding-fixes/public/notebooks/NDIFGetStarted.ipynb>`
+
+This notebook will walk you through the following steps:
+
+#. Installing NNsight
+#. Setting up your NDIF API key
+#. Loading a LLM in NNsight
+#. Accessing and altering LLM internals remotely
+
+
+Next Steps
+-----------
+
+.. grid:: 2 2 2 2 
+   :gutter: 2
+
+   .. grid-item-card:: Walkthrough
+      :link: notebooks/tutorials/walkthrough.ipynb
+
+      Walk through the basic functionality of the package.
+
+   .. grid-item-card:: Remote Access
+      :link: notebooks/features/remote_execution.ipynb
+
+      Configure API access for remote model execution.
+
+   .. grid-item-card:: Features
+      :link: features
+      :link-type: doc
+
+      Check out the basic features provided by :bdg-primary:`nnsight`.
+
+   .. grid-item-card:: Tutorials
+      :link: tutorials
+      :link-type: doc
+
+      See :bdg-primary:`nnsight` implementations of common interpretability techniques.
+
+   .. grid-item-card:: Forum
+      :link: https://discuss.ndif.us/
+
+      Discuss :bdg-primary:`nnsight`, NDIF, and more!
+
+
+
+
+
+
+---
+File: /docs/source/status.rst
+---
+
+:html_theme.sidebar_secondary.remove:
+:sd_hide_title:
+
+.. raw:: html
+
+    <style>
+        .accordion-header {
+            margin: 0 !important;
+        }
+
+        /* Custom accordion styles */
+        .custom-accordion-header {
+            background-color: var(--pst-color-surface);
+            /* Default state background color */
+            color: var(--pst-color-text-base);
+            /* Text color */
+            border-bottom: var(--pst-color-border);
+            /* Border color */
+        }
+
+        .custom-accordion-header {
+            background-color: var(--pst-color-surface);
+            /* Default state background color */
+            color: var(--pst-color-text-base);
+            /* Text color */
+            border-bottom: var(--pst-color-border);
+            /* Border color */
+        }
+
+        .accordion {
+            --bs-accordion-btn-icon: none;
+            --bs-accordion-btn-active-icon: none;
+        }
+
+        .custom-accordion-header.collapsed {
+            background-color: var(--pst-color-on-background);
+            /* Collapsed state background color */
+            color: var(--pst-color-text-base);
+            /* Text color */
+        }
+
+        .custom-accordion-header:not(.collapsed) {
+            background-color: var(--pst-color-surface);
+            /* Active/Expanded state background color */
+            color: var(--pst-color-text-base);
+            /* Text color */
+        }
+
+        .custom-accordion-body {
+            background-color: var(--pst-color-on-background);
+            /* Body background color */
+            border-color: var(--pst-color-border);
+            /* Border color */
+            color: var(--pst-color-text-base);
+            /* Text color */
+        }
+
+        .sd-card {
+            border-radius: 0 !important;
+        }
+
+        #loader {
+            width: 120px;
+            height: 120px;
+            display: inline-block;
+            position: relative;
+        }
+        #loader::after,
+        #loader::before {
+            content: '';  
+            box-sizing: border-box;
+            width:120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #FFF;
+            position: absolute;
+            left: 0;
+            top: 0;
+            animation: animloader 2s linear infinite;
+        }
+        #loader::after {
+            animation-delay: 1s;
+        }
+        
+        @keyframes animloader {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+    </style>
+
+
+    <script>
+
+        let ndif_url = "https://ndif.dev"
+        let error_color = "#7e0000"
+        let success_color = "#66800b"
+        let warning_color = "#7d7106"
+
+        function autoFormatJsonString(jsonString) {
+            // Parse the JSON string into an object
+            let jsonObject = JSON.parse(jsonString);
+
+            // Convert the object back into a string with indentation
+            let prettyPrintedJson = JSON.stringify(jsonObject, null, 2);
+
+            // Replace keys in the JSON string with styled spans
+            prettyPrintedJson = prettyPrintedJson.replace(/"([^"]+)":/g, '<span style="background-color: lightgrey;">"$1":</span>');
+
+            // Set the formatted JSON string as the innerHTML of the element
+            document.getElementById('jsonContainer').innerHTML = `<pre>${prettyPrintedJson}</pre>`;
+        };
+
+        function update(message, color) {
+            document.querySelectorAll('div.sd-card-body.status-container').forEach(el => {
+                el.style.backgroundColor = color;
+                el.querySelectorAll('p.sd-card-text').forEach(el => {
+                    el.textContent = message;
+                });
+            });
+        }
+
+        function loading(flag) {
+            document.getElementById("loader").style.display = flag ? "block" : "none";
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            loading(true);
+
+            update("Fetching NDIF status...", warning_color);
+
+            fetch(ndif_url + "/ping")
+
+                .then((response) => {
+                    if (response.status == 200) {
+
+                        update("NDIF is up. Fetching model status...", warning_color);
+
+                        console.log('Ping success');
+                        // Nested fetch to ndif.dev/stats
+                        fetch(ndif_url + "/stats")
+                            .then((statsResponse) => {
+
+                                loading(false);
+
+                                if (statsResponse.status == 200) {
+                                    statsResponse.json().then((parsed) => {
+                                        // Initialize an empty string to accumulate information
+                                        let infoString = '';
+
+                                        let index = 0;
+
+                                        let modelSummary = {};
+
+                                        if (parsed.length === 0) {
+
+                                            update("NDIF is up but there are no models deployed. Seems unintentional.", error_color);
+
+                                            return
+                                        }
+
+
+                                        update("NDIF is operational.", success_color);
+
+                                        Object.values(parsed).forEach((value) => {
+                                            // Create a unique key for each model-config combination
+                                            let modelConfigKey = `${value.repo_id}`;
+
+                                            // Check if this model-config combination already exists in the summary
+                                            if (modelSummary[modelConfigKey]) {
+                                                // Increment the count if it does
+                                                modelSummary[modelConfigKey].number_of_copies += 1;
+                                            } else {
+                                                // Otherwise, add a new entry
+                                                modelSummary[modelConfigKey] = {
+                                                    number_of_copies: 1,
+                                                    config_string: value.config_json_string
+                                                };
+                                            }
+                                        });
+
+                                        // Now modelSummary contains the consolidated information
+                                        console.log(modelSummary);
+
+                                        // Iterate through the JSON dictionary and append information
+                                        // Iterate through the modelSummary dictionary and append information
+                                        Object.keys(modelSummary).forEach((key) => {
+                                            var headingId = 'heading' + (index + 1);
+                                            var collapseId = 'collapse' + (index + 1);
+
+                                            const summaryItem = modelSummary[key];
+                                            const configJsonString = summaryItem.config_string;
+
+                                            let jsonObject = JSON.parse(configJsonString);
+
+                                            // Convert the object back into a string with indentation
+                                            let prettyPrintedJson = JSON.stringify(jsonObject, null, 4);
+
+                                            prettyPrintedJson = prettyPrintedJson.replace(/"([^"]+)":/g, '"<b>$1</b>":');
+                                            let huggingFaceLink = `<a href="http://huggingface.co/${key}" target="_blank">HuggingFace Model Repository ↗</a>`;
+
+                                            infoString += `<div class="accordion-item">
+                                                    <h2 class="accordion-header" id="${headingId}">
+                                                        <button class="accordion-button custom-accordion-header collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+                                                            (${summaryItem.number_of_copies}x) ${key}
+                                                        </button>
+                                                    </h2>
+                                                    <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headingId}" data-bs-parent="#accordionExample">
+                                                        <div class="accordion-body custom-accordion-body">${huggingFaceLink}<pre>${prettyPrintedJson}</pre></div>
+                                                    </div>
+                                                </div>`;
+
+
+                                            index++;
+                                        });
+
+                                        var elm = document.getElementById("accordionHook");
+
+                                        elm.innerHTML = infoString;
+
+
+                                        console.log('Stats success');
+                                    }).catch((jsonError) => {
+                                        console.log('JSON parsing error:', jsonError);
+                                    });
+                                } else {
+                                    update("Unable to get NDIF status.", error_color);
+
+                                }
+                            })
+                            .catch((statsError) => {
+                                update("Unable to get NDIF status.", error_color);
+                                loading(false);
+
+                                console.log('Stats error', statsError);
+                            });
+                    } else {
+                        update("NDIF is unavailable", error_color);
+                        loading(false);
+                        console.log('Ping error');
+                    }
+                })
+                .catch((pingError) => {
+                    update("NDIF is unavailable", error_color);
+                    loading(false);
+                    console.error('Ping fetch failed:', pingError);
+                });
+
+        }, false);
+    </script>
+
+
+Status
+======
+
+.. card::
+    :class-body: status-container
+    :shadow: none
+
+    Getting Status
+
+.. card::
+    :shadow: none
+    
+    The library can be used to run local models without requiring a key. However, running experiments on remote models requires a free server API key. To obtain a key, register for an `NDIF account <https://login.ndif.us>`_ which allows you to manage and generate keys.
+    For information on API key configuration and remote system limits, please refer to our `Remote Execution Tutorial <https://nnsight.net/notebooks/features/remote_execution/>`_.
+
+    We currently have engineers on call Monday to Friday from 9 AM to 5 PM ET to assist with any connectivity issues for our remote models. Please reach out to us on `Discord <https://discord.com/invite/6uFJmCSwW7>`_ or at mailto:info@ndif.us.
+
+.. raw:: html
+
+    <div style="
+        width:100%;
+        display: flex;
+        justify-content: center;
+        ">
+        <div id="loader"></div>
+    </div>
+    
+
+
+    <div class="accordion accordion-flush" id="accordionHook">
+    </div>
+
+
+---
+File: /docs/source/tutorials.rst
+---
+
+.. role:: raw-html(raw)
+   :format: html
+
+.. raw:: html
+
+   <script>
+   document.addEventListener('DOMContentLoaded', (event) => {
+      document.querySelectorAll('h5.card-title').forEach(el => {
+      el.style.margin = '0';
+      });
+   });
+   </script>
+
+   <style>
+      .toctree-wrapper {
+         display: none !important;
+      }
+      h5 {
+         margin-top: 0 !important;
+      }
+   </style>
+
+
+Tutorials
+=========
+
+.. grid:: 1 1 2 2
+   :class-container: tutorial-card-section
+   :gutter: 3
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/walkthrough.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-person-walking fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Walkthrough</h5>
+               <p class="card-text">Learn the basics</p>
+            </div>
+         </div>
+
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/start_remote_access.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-satellite-dish fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Access LLMs</h5>
+               <p class="card-text">Use our hosted models</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/activation_patching.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-code-pull-request fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Activation Patching</h5>
+               <p class="card-text">Causal intervention</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/attribution_patching.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-diagram-project fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Attribution Patching</h5>
+               <p class="card-text">Approximate patching</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/boundless_DAS.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-magnifying-glass fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Boundless DAS</h5>
+               <p class="card-text">Identifying causal mechanisms</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/dict_learning.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-book-open fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Dictionary Learning</h5>
+               <p class="card-text">Sparse autoencoders</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/diffusion_lens.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-camera-retro fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Diffusion Lens</h5>
+               <p class="card-text">Explore diffusion model text embedding</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/function_vectors.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-dharmachakra fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Function Vectors</h5>
+               <p class="card-text">Steer model behavior</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/logit_lens.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-arrow-down-a-z fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">Logit Lens</h5>
+               <p class="card-text">Decode activations</p>
+            </div>
+         </div>
+
+   .. grid-item-card:: 
+      :link: notebooks/tutorials/LoRA_tutorial.ipynb
+      :class-card: surface
+      :class-body: surface
+
+      .. raw:: html
+
+         <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-center" style="min-width: 50px; margin-right: 15px; height: 100%;">
+               <i class="fa-solid fa-sliders fa-2x"></i>
+            </div> 
+            <div>
+               <h5 class="card-title">LoRA</h5>
+               <p class="card-text">Fine tuning for sentiment analysis</p>
+            </div>
+         </div>      
+
+Report Issues
+-------------
+
+NNsight and NDIF are open-source and you can report issues, read, and clone the full source at https://github.com/ndif-team/nnsight. 
+Also check out https://discuss.ndif.us/ to ask questions about our tutorials, share your projects in NNsight, or request new tutorials.
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+
+   notebooks/tutorials/*
+
+
+
+
+
+---
+File: /docs/sourcelatex/documentation/contexts.rst
+---
+
+nnsight.contexts
+-----------------
+
+
+.. automodule:: nnsight.contexts
+   :members:
+
+.. automodule:: nnsight.contexts.Runner
+   :members:
+
+.. automodule:: nnsight.contexts.Tracer
+   :members:
+
+.. automodule:: nnsight.contexts.Invoker
+   :members:
+
+
+
+
+---
+File: /docs/sourcelatex/documentation/intervention.rst
+---
+
+nnsight.intervention
+--------------------
+
+.. automodule:: nnsight.intervention
+   :members:
+
+
+---
+File: /docs/sourcelatex/documentation/models.rst
+---
+
+nnsight.models
+--------------
+
+
+.. automodule:: nnsight.models
+   :members:
+
+
+.. automodule:: nnsight.models.NNsightModel
+   :members:
+
+
+.. automodule:: nnsight.models.LanguageModel
+   :members:
+
+
+.. automodule:: nnsight.models.DiffuserModel
+   :members:
+
+
+---
+File: /docs/sourcelatex/documentation/module.rst
+---
+
+nnsight.module
+--------------
+
+.. automodule:: nnsight.Module
+   :members:
+
+
+---
+File: /docs/sourcelatex/documentation/patching.rst
+---
+
+nnsight.patching
+----------------
+
+
+.. automodule:: nnsight.patching
+   :members:
+
+
+---
+File: /docs/sourcelatex/documentation/tracing.rst
+---
+
+nnsight.tracing
+---------------
+
+.. automodule:: nnsight.tracing
+   :members:
+
+.. automodule:: nnsight.tracing.Graph
+   :members:
+
+.. automodule:: nnsight.tracing.Node
+   :members:
+
+.. automodule:: nnsight.tracing.Proxy
+   :members:
+
+
+
+---
+File: /docs/sourcelatex/documentation/util.rst
+---
+
+nnsight.util
+------------
+
+
+.. automodule:: nnsight.util
+   :members:
+
+
+---
+File: /docs/sourcelatex/index.rst
+---
+
+Documentation
+=============
+
+.. toctree::
+   :titlesonly:
+
+   documentation/models
+   documentation/module
+   documentation/contexts
+   documentation/util
+   documentation/intervention
+   documentation/tracing
+   documentation/patching
+
+
+
+---
+File: /docs/contributing.md
+---
+
+# Installation
+
+Run `pip install -r requirements.txt` while in the `nnsight/docs` directory.
+
+Optionally, run `pip install -e nnsight` from the root directory to use the working dir
+
+If you haven't already, you should also install pandoc. With brew run: `brew install pandoc`
+
+# Adding Tutorials
+
+Tutorials are written as Jupyter Notebooks in `.ipynb` format, and automatically converted to html by the `nbsphinx` extension.
+
+The only requirement of `nbsphinx` is that you add a header to the notebook to act as the rendered title on Sphinx docs. To do this, create a markdown cell at the top of your notebook with a header `#`.
+
+Then, just add your notebook to the `nnsight/docs/source/notebooks/tutorials` directory.
+
+If you're adding a new notebook, navigate to `nnsight/docs/source/tutorials.rst`. At the bottom of the page, add the path to your notebook under the `toctree`.
+
+```
+.. toctree::
+   :maxdepth: 1
+
+   notebooks/tutorials/walkthrough.ipynb
+   ...
+   <YOUR NOTEBOOK PATH>
+
+```
+
+# Compiling Sphinx to HTML
+
+Run `make dirhtml` from the `nnsight/docs` directory. The build is located in `nnsight/docs/build/dirhtml`. You can run `python3 -m http.server <PORT>` from that directory, and see the site at `http://localhost:<PORT>`.
+
+
+
+---
+File: /CHANGELOG.md
+---
+
+# Changelog
+
+## `0.3.0`
+
+_released: 2024-08-29_
+
+We are excited to announce the release of `nnsight0.3`.
+
+This version significantly enhances the library's remote execution capabilities. It improves the integration experience with the [NDIF](https://ndif.us) backend and allows users to define and execute optimized training loop workflows directly on the remote server, including LoRA and other PEFT methods.
+
+### Breaking Changes
+
+-  Module `input` access has a syntactic change:
+    - Old: `nnsight.Envoy.input`
+    - New: `nnsight.Envoy.inputs`
+    - Note: `nnsight.Envoy.input` now provides access to the first positional argument of the module's input.
+
+- `scan` & `validate` are set to `False` by default in the `Tracer` context.
+
+### New Features
+
+- [<ins>Session context</ins>](https://nnsight.net/notebooks/features/sessions/): efficiently package multi-tracing experiments into a single request, enabling faster, more scalable remote experimentation.
+
+- [<ins>Iterator context</ins>](https://nnsight.net/notebooks/features/iterator/): define an intervention loop for iterative execution.
+
+- [<ins>Model editing</ins>](nnsight.net/notebooks/features/model_editing/): alter a model by setting default edits and interventions in an editing context, applied before each forward pass.
+
+- [<ins>Early stopping</ins>](https://nnsight.net/notebooks/features/early_stopping/): interrup a model's forward pass at a chosen module before execution completes. 
+
+- [<ins>Conditional context</ins>](https://nnsight.net/notebooks/features/conditionals/): define interventions within a Conditional context, executed only when the specified condition evaluates to be True.
+
+- [<ins>Scanning context</ins>](https://nnsight.net/notebooks/features/scan_validate/): perform exclusive model scanning to gather important insights.
+
+- <ins>`nnsight` builtins</ins>: define traceable `Python` builtins as part of the intervention graph.
+
+- <ins>Proxy update</ins>: assign new values to existing proxies. 
+     
+- <ins>In-Trace logging</ins>: add log statements to be called during the intervention graph execution.
+
+- [<ins>Traceable function calls</ins>](https://nnsight.net/notebooks/features/custom_functions/): make unsupported functions traceable by the intervention graph. Note that [<ins>all pytorch functions are now traceable</ins>](https://nnsight.net/notebooks/features/operations/) by `nnsight` by default.
+
+
+
+---
+File: /CODE_OF_CONDUCT.md
+---
+
+
+# Contributor Covenant Code of Conduct
+
+## Our Pledge
+
+We as members, contributors, and leaders pledge to make participation in our
+community a harassment-free experience for everyone, regardless of age, body
+size, visible or invisible disability, ethnicity, sex characteristics, gender
+identity and expression, level of experience, education, socio-economic status,
+nationality, personal appearance, race, caste, color, religion, or sexual
+identity and orientation.
+
+We pledge to act and interact in ways that contribute to an open, welcoming,
+diverse, inclusive, and healthy community.
+
+## Our Standards
+
+Examples of behavior that contributes to a positive environment for our
+community include:
+
+* Demonstrating empathy and kindness toward other people
+* Being respectful of differing opinions, viewpoints, and experiences
+* Giving and gracefully accepting constructive feedback
+* Accepting responsibility and apologizing to those affected by our mistakes,
+  and learning from the experience
+* Focusing on what is best not just for us as individuals, but for the overall
+  community
+
+Examples of unacceptable behavior include:
+
+* The use of sexualized language or imagery, and sexual attention or advances of
+  any kind
+* Trolling, insulting or derogatory comments, and personal or political attacks
+* Public or private harassment
+* Publishing others' private information, such as a physical or email address,
+  without their explicit permission
+* Other conduct which could reasonably be considered inappropriate in a
+  professional setting
+
+## Enforcement Responsibilities
+
+Community leaders are responsible for clarifying and enforcing our standards of
+acceptable behavior and will take appropriate and fair corrective action in
+response to any behavior that they deem inappropriate, threatening, offensive,
+or harmful.
+
+Community leaders have the right and responsibility to remove, edit, or reject
+comments, commits, code, wiki edits, issues, and other contributions that are
+not aligned to this Code of Conduct, and will communicate reasons for moderation
+decisions when appropriate.
+
+## Scope
+
+This Code of Conduct applies within all community spaces, and also applies when
+an individual is officially representing the community in public spaces.
+Examples of representing our community include using an official email address,
+posting via an official social media account, or acting as an appointed
+representative at an online or offline event.
+
+## Enforcement
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be
+reported to the community leaders responsible for enforcement at j.bell@northeastern.edu .
+All complaints will be reviewed and investigated promptly and fairly.
+
+All community leaders are obligated to respect the privacy and security of the
+reporter of any incident.
+
+## Enforcement Guidelines
+
+Community leaders will follow these Community Impact Guidelines in determining
+the consequences for any action they deem in violation of this Code of Conduct:
+
+### 1. Correction
+
+**Community Impact**: Use of inappropriate language or other behavior deemed
+unprofessional or unwelcome in the community.
+
+**Consequence**: A private, written warning from community leaders, providing
+clarity around the nature of the violation and an explanation of why the
+behavior was inappropriate. A public apology may be requested.
+
+### 2. Warning
+
+**Community Impact**: A violation through a single incident or series of
+actions.
+
+**Consequence**: A warning with consequences for continued behavior. No
+interaction with the people involved, including unsolicited interaction with
+those enforcing the Code of Conduct, for a specified period of time. This
+includes avoiding interactions in community spaces as well as external channels
+like social media. Violating these terms may lead to a temporary or permanent
+ban.
+
+### 3. Temporary Ban
+
+**Community Impact**: A serious violation of community standards, including
+sustained inappropriate behavior.
+
+**Consequence**: A temporary ban from any sort of interaction or public
+communication with the community for a specified period of time. No public or
+private interaction with the people involved, including unsolicited interaction
+with those enforcing the Code of Conduct, is allowed during this period.
+Violating these terms may lead to a permanent ban.
+
+### 4. Permanent Ban
+
+**Community Impact**: Demonstrating a pattern of violation of community
+standards, including sustained inappropriate behavior, harassment of an
+individual, or aggression toward or disparagement of classes of individuals.
+
+**Consequence**: A permanent ban from any sort of public interaction within the
+community.
+
+## Attribution
+
+This Code of Conduct is adapted from the [Contributor Covenant][homepage],
+version 2.1, available at
+[https://www.contributor-covenant.org/version/2/1/code_of_conduct.html][v2.1].
+
+Community Impact Guidelines were inspired by
+[Mozilla's code of conduct enforcement ladder][Mozilla CoC].
+
+For answers to common questions about this code of conduct, see the FAQ at
+[https://www.contributor-covenant.org/faq][FAQ]. Translations are available at
+[https://www.contributor-covenant.org/translations][translations].
+
+[homepage]: https://www.contributor-covenant.org
+[v2.1]: https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
+[Mozilla CoC]: https://github.com/mozilla/diversity
+[FAQ]: https://www.contributor-covenant.org/faq
+[translations]: https://www.contributor-covenant.org/translations
+
+
+
+---
+File: /README.md
+---
+
+<img src="./docs/source/_static/images/nnsight_logo.svg" alt="drawing" style="width:200px;float:left"/>
+
+# nnsight 
+
+<a href="https://arxiv.org/abs/2407.14561"><img src="https://img.shields.io/badge/READ%20THE%20PAPER%20HERE!-orange" style="transform: scale(3);"></a>
+
+<a href="https://www.nnsight.net"><img src="https://img.shields.io/badge/-Read%20the%20Docs%20Here-blue?style=for-the-badge&logo=Read-the-Docs&logoColor=white"></img></a> <a href="https://discord.gg/6uFJmCSwW7"><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
+
+The `nnsight`  package enables interpreting and manipulating the internals of deep learned models. Read our [paper!](https://arxiv.org/abs/2407.14561)
+
+#### Installation
+
+Install this package through pip by running:
+
+`pip install nnsight`
+
+#### Examples
+
+Here is a simple example where we run the nnsight API locally on gpt2 and save the hidden states of the last layer:
+
+```python
+from nnsight import LanguageModel
+
+model = LanguageModel('openai-community/gpt2', device_map='auto')
+
+with model.trace('The Eiffel Tower is in the city of') as tracer:
+
+      hidden_states = model.transformer.h[-1].output[0].save()
+
+      output = model.output.save()
+```
+
+Lets go over this piece by piece.
+
+We import the `LanguageModel` object from the `nnsight` module and create a gpt2 model using the huggingface repo ID for gpt2, `'openai-community/gpt2'`. This accepts arguments to create the model including `device_map` to specify which device to run on.
+
+```python
+from nnsight import LanguageModel
+
+model = LanguageModel('openai-community/gpt2',device_map='auto')
+```
+
+Then, we create a tracing context block by calling `.trace(...)` on the model object. This denotes we want to run the model with our prompt.
+
+
+```python
+with model.trace('The Eiffel Tower is in the city of') as tracer:
+```
+
+Now calling `.trace(...)` does not actually initialize or run the model. Only after the tracing` block is exited, is the actual model loaded and ran. All operations in the block are "proxies" which essentially creates a graph of operations we wish to carry out later.
+
+Within this context, all operations/interventions will be applied to the processing of the given prompt.
+
+```python
+hidden_states = model.transformer.h[-1].output[0].save()
+```
+
+On this line were saying, access the last layer of the transformer `model.transformer.h[-1]`, access its output `.output`, index it at 0 `.output[0]`, and save it `.save()`
+
+A few things, we can see the module tree of the model by printing the model. This allows us to know what attributes to access to get to the module we need.
+Running `print(model)` results in:
+
+```
+GPT2LMHeadModel(
+  (transformer): GPT2Model(
+    (wte): Embedding(50257, 768)
+    (wpe): Embedding(1024, 768)
+    (drop): Dropout(p=0.1, inplace=False)
+    (h): ModuleList(
+      (0-11): 12 x GPT2Block(
+        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (attn): GPT2Attention(
+          (c_attn): Conv1D()
+          (c_proj): Conv1D()
+          (attn_dropout): Dropout(p=0.1, inplace=False)
+          (resid_dropout): Dropout(p=0.1, inplace=False)
+        )
+        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (mlp): GPT2MLP(
+          (c_fc): Conv1D()
+          (c_proj): Conv1D()
+          (act): NewGELUActivation()
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+      )
+    )
+    (ln_f): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  )
+  (lm_head): Linear(in_features=768, out_features=50257, bias=False)
+)
+```
+
+`.output` returns a proxy for the output of this module. This essentially means were saying, when we get to the output of this module during inference, grab it and perform any operations we define on it (which also become proxies). There are two operational proxies here, one for getting the 0th index of the output, and one for saving the output. We take the 0th index because the output of gpt2 transformer layers are a tuple where the first index are the actual hidden states (last two indicies are from attention). We can call `.shape` on any proxies to get what shape the value will eventually be. 
+Running `print(model.transformer.h[-1].output.shape)` returns `(torch.Size([1, 10, 768]), (torch.Size([1, 12, 10, 64]), torch.Size([1, 12, 10, 64])))`
+
+During processing of the intervention computational graph we are building, when the value of a proxy is no longer ever needed, its value is dereferenced and destroyed. However calling `.save()` on the proxy informs the computation graph to save the value of this proxy and never destroy it, allowing us to access to value after generation.
+
+After exiting the generator context, the model is ran with the specified arguments and intervention graph. `output` is populated with the actual output and `hidden_states` will contain the hidden value.
+
+```python
+print(output)
+print(hidden_states)
+```
+
+returns:
+
+```
+tensor([[ 464,  412,  733,  417, 8765,  318,  287,  262, 1748,  286, 6342]],
+       device='cuda:0')
+tensor([[[ 0.0505, -0.1728, -0.1690,  ..., -1.0096,  0.1280, -1.0687],
+         [ 8.7494,  2.9057,  5.3024,  ..., -8.0418,  1.2964, -2.8677],
+         [ 0.2960,  4.6686, -3.6642,  ...,  0.2391, -2.6064,  3.2263],
+         ...,
+         [ 2.1537,  6.8917,  3.8651,  ...,  0.0588, -1.9866,  5.9188],
+         [-0.4460,  7.4285, -9.3065,  ...,  2.0528, -2.7946,  0.5556],
+         [ 6.6286,  1.7258,  4.7969,  ...,  7.6714,  3.0682,  2.0481]]],
+       device='cuda:0')
+```
+
+
+
+---
+
+###### Operations
+
+Most basic operations and torch operations work on proxies and are added to the computation graph. 
+
+```python
+from nnsight import LanguageModel
+import torch 
+
+model = LanguageModel('openai-community/gpt2', device_map='cuda')
+
+with model.trace('The Eiffel Tower is in the city of'):
+
+  hidden_states_pre = model.transformer.h[-1].output[0].save()
+
+  hs_sum = torch.sum(hidden_states_pre).save()
+
+  hs_edited = hidden_states_pre + hs_sum
+
+  hs_edited = hs_edited.save()
+
+print(hidden_states_pre)
+print(hs_sum)
+print(hs_edited)
+```
+
+In this example we get the sum of the hidden states and add them to the hidden_states themselves (for whatever reason). By saving the various steps, we can see how the values change.
+
+```
+tensor([[[ 0.0505, -0.1728, -0.1690,  ..., -1.0096,  0.1280, -1.0687],
+         [ 8.7494,  2.9057,  5.3024,  ..., -8.0418,  1.2964, -2.8677],
+         [ 0.2960,  4.6686, -3.6642,  ...,  0.2391, -2.6064,  3.2263],
+         ...,
+         [ 2.1537,  6.8917,  3.8651,  ...,  0.0588, -1.9866,  5.9188],
+         [-0.4460,  7.4285, -9.3065,  ...,  2.0528, -2.7946,  0.5556],
+         [ 6.6286,  1.7258,  4.7969,  ...,  7.6714,  3.0682,  2.0481]]],
+       device='cuda:0')
+tensor(501.2957, device='cuda:0')
+tensor([[[501.3461, 501.1229, 501.1267,  ..., 500.2860, 501.4237, 500.2270],
+         [510.0451, 504.2014, 506.5981,  ..., 493.2538, 502.5920, 498.4279],
+         [501.5916, 505.9643, 497.6315,  ..., 501.5348, 498.6892, 504.5219],
+         ...,
+         [503.4493, 508.1874, 505.1607,  ..., 501.3545, 499.3091, 507.2145],
+         [500.8496, 508.7242, 491.9892,  ..., 503.3485, 498.5010, 501.8512],
+         [507.9242, 503.0215, 506.0926,  ..., 508.9671, 504.3639, 503.3438]]],
+       device='cuda:0')
+       
+```
+
+---
+###### Setting
+
+We often not only want to see whats happening during computation, but intervene and edit the flow of information. 
+
+```python
+from nnsight import LanguageModel
+import torch 
+
+model = LanguageModel('openai-community/gpt2', device_map='cuda')
+
+with model.trace('The Eiffel Tower is in the city of') as tracer:
+
+  hidden_states_pre = model.transformer.h[-1].mlp.output.clone().save()
+
+  noise = (0.001**0.5)*torch.randn(hidden_states_pre.shape)
+
+  model.transformer.h[-1].mlp.output = hidden_states_pre + noise
+
+  hidden_states_post = model.transformer.h[-1].mlp.output.save()
+
+print(hidden_states_pre)
+print(hidden_states_post)
+```
+In this example, we create a tensor of noise to add to the hidden states. We then add it, use the assigment `=` operator to update the value of `.output` with these new noised activations. 
+
+We can see the change in the results:
+
+```
+tensor([[[ 0.0505, -0.1728, -0.1690,  ..., -1.0096,  0.1280, -1.0687],
+         [ 8.7494,  2.9057,  5.3024,  ..., -8.0418,  1.2964, -2.8677],
+         [ 0.2960,  4.6686, -3.6642,  ...,  0.2391, -2.6064,  3.2263],
+         ...,
+         [ 2.1537,  6.8917,  3.8651,  ...,  0.0588, -1.9866,  5.9188],
+         [-0.4460,  7.4285, -9.3065,  ...,  2.0528, -2.7946,  0.5556],
+         [ 6.6286,  1.7258,  4.7969,  ...,  7.6714,  3.0682,  2.0481]]],
+       device='cuda:0')
+tensor([[[ 0.0674, -0.1741, -0.1771,  ..., -0.9811,  0.1972, -1.0645],
+         [ 8.7080,  2.9067,  5.2924,  ..., -8.0253,  1.2729, -2.8419],
+         [ 0.2611,  4.6911, -3.6434,  ...,  0.2295, -2.6007,  3.2635],
+         ...,
+         [ 2.1859,  6.9242,  3.8666,  ...,  0.0556, -2.0282,  5.8863],
+         [-0.4568,  7.4101, -9.3698,  ...,  2.0630, -2.7971,  0.5522],
+         [ 6.6764,  1.7416,  4.8027,  ...,  7.6507,  3.0754,  2.0218]]],
+       device='cuda:0')
+```
+
+---
+###### Multiple Token Generation
+
+When generating more than one token, use `.generate(...) ` and `.next()`  on the module you want to get the next value of to denote following interventions should be applied to the subsequent generations.
+
+Here we again generate using gpt2, but generate three tokens and save the hidden states of the last layer for each one:
+
+```python
+from nnsight import LanguageModel
+
+model = LanguageModel('openai-community/gpt2', device_map='cuda')
+
+with model.generate('The Eiffel Tower is in the city of', max_new_tokens=3) as tracer:
+ 
+  hidden_states1 = model.transformer.h[-1].output[0].save()
+
+  invoker.next()
+
+  hidden_states2 = model.transformer.h[-1].next().output[0].save()
+
+  invoker.next()
+
+  hidden_states3 = model.transformer.h[-1].next().output[0].save()
+
+```
+---
+
+###### Cross Prompt Intervention
+
+
+Intervention operations work cross prompt! Use two invocations within the same generation block and operations can work between them.
+
+You can do this by not passing a prompt into `.trace`/`.generate`, but by calling `.invoke(...)` on the created tracer object.
+
+In this case, we grab the token embeddings coming from the first prompt, `"Madison square garden is located in the city of New"` and replace the embeddings of the second prompt with them.
+
+```python
+from nnsight import LanguageModel
+
+model = LanguageModel('openai-community/gpt2', device_map='cuda')
+
+with model.generate(max_new_tokens=3) as tracer:
+    
+    with tracer.invoke("Madison square garden is located in the city of New"):
+
+        embeddings = model.transformer.wte.output
+
+    with tracer.invoke("_ _ _ _ _ _ _ _ _ _"):
+
+        model.transformer.wte.output = embeddings
+
+        output = model.generator.output.save()
+
+print(model.tokenizer.decode(output[0]))
+print(model.tokenizer.decode(output[1]))
+```
+
+This results in:
+
+```
+Madison square garden is located in the city of New York City.
+_ _ _ _ _ _ _ _ _ _ York City.
+```
+
+We also could have entered a pre-saved embedding tensor as shown here:
+
+```python
+from nnsight import LanguageModel
+
+model = LanguageModel('openai-community/gpt2', device_map='cuda')
+
+with model.generate(max_new_tokens=3) as tracer:
+    
+    with tracer.invoke("Madison square garden is located in the city of New") as invoker:
+
+        embeddings = model.transformer.wte.output.save()
+
+with model.generate(max_new_tokens=3) as tracer:
+
+    with tracer.invoke("_ _ _ _ _ _ _ _ _ _") as invoker:
+
+        model.transformer.wte.output = embeddings.value
+
+```
+---
+
+###### Ad-hoc Module
+
+Another thing we can do is apply modules in the model's module tree at any point during computation, even if it's out of order.
+
+```python
+from nnsight import LanguageModel
+import torch
+
+model = LanguageModel("openai-community/gpt2", device_map='cuda')
+
+with model.generate('The Eiffel Tower is in the city of') as generator:
+
+  hidden_states = model.transformer.h[-1].output[0]
+  hidden_states = model.lm_head(model.transformer.ln_f(hidden_states)).save()
+  tokens = torch.softmax(hidden_states, dim=2).argmax(dim=2).save()
+        
+print(hidden_states)
+print(tokens)
+print(model.tokenizer.decode(tokens[0]))
+
+```
+
+Here we get the hidden states of the last layer like usual. We also chain apply `model.transformer.ln_f` and `model.lm_head` in order to "decode" the hidden states into vocabularly space.
+Applying softmax and then argmax allows us to then transform the vocabulary space hidden states into actually tokens which we can then use the tokenizer to decode.
+
+The output looks like:
+
+```
+tensor([[[ -36.2874,  -35.0114,  -38.0793,  ...,  -40.5163,  -41.3759,
+           -34.9193],
+         [ -68.8886,  -70.1562,  -71.8408,  ...,  -80.4195,  -78.2552,
+           -71.1206],
+         [ -82.2950,  -81.6519,  -83.9941,  ...,  -94.4878,  -94.5194,
+           -85.6998],
+         ...,
+         [-113.8675, -111.8628, -113.6634,  ..., -116.7652, -114.8267,
+          -112.3621],
+         [ -81.8531,  -83.3006,  -91.8192,  ...,  -92.9943,  -89.8382,
+           -85.6898],
+         [-103.9307, -102.5054, -105.1563,  ..., -109.3099, -110.4195,
+          -103.1395]]], device='cuda:0')
+tensor([[ 198,   12,  417, 8765,  318,  257,  262, 3504, 7372, 6342]],
+       device='cuda:0')
+
+-el Tower is a the middle centre Paris
+```
+
+---
+
+More examples can be found at [nnsight.net](https://www.nnsight.net)
+
+### Citation
+
+If you use `nnsight` in your research, please cite using the following
+
+```bibtex
+@article{fiottokaufman2024nnsightndifdemocratizingaccess,
+      title={NNsight and NDIF: Democratizing Access to Foundation Model Internals}, 
+      author={Jaden Fiotto-Kaufman and Alexander R Loftus and Eric Todd and Jannik Brinkmann and Caden Juang and Koyena Pal and Can Rager and Aaron Mueller and Samuel Marks and Arnab Sen Sharma and Francesca Lucchetti and Michael Ripa and Adam Belfki and Nikhil Prakash and Sumeet Multani and Carla Brodley and Arjun Guha and Jonathan Bell and Byron Wallace and David Bau},
+      year={2024},
+      eprint={2407.14561},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2407.14561}, 
+}
+``````
+

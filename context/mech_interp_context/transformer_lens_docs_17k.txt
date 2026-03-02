@@ -1,0 +1,1024 @@
+Directory Structure:
+
+└── ./
+    ├── docs
+    │   └── source
+    │       ├── _static
+    │       │   └── model_properties_table_interactive.html
+    │       └── content
+    │           ├── news
+    │           │   └── release-2.0.md
+    │           ├── citation.md
+    │           ├── contributing.md
+    │           ├── gallery.md
+    │           ├── getting_started_mech_interp.md
+    │           ├── getting_started.md
+    │           ├── special_cases.md
+    │           └── tutorials.md
+    ├── further_comments.md
+    └── README.md
+
+
+
+---
+File: /docs/source/_static/model_properties_table_interactive.html
+---
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>TransformerLens models</title>
+	<script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+	<style>
+		header {
+			background-color: #f4f4f4;
+			padding: 10px;
+			text-align: left;
+		}
+
+		body,
+		html {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			/* Ensure the body takes up full viewport width */
+		}
+
+		.ag-theme-alpine {
+			height: 80%;
+			width: 100%;
+			/* This should already keep the grid within the page width */
+			box-sizing: border-box;
+			/* Ensure padding and borders are included in the width */
+		}
+
+		.ag-paging-panel {
+			/* Aligns children (the pagination buttons) to the start of the container, i.e., left side */
+			justify-content: flex-start;
+			align-items: center;
+		}
+	</style>
+</head>
+
+<body>
+	<header>
+		Model table for <a href="https://github.com/neelnanda-io/TransformerLens">TransformerLens</a>. Source code: <a
+			href="https://github.com/mivanit/transformerlens-model-table">github.com/mivanit/transformerlens-model-table</a>.
+		Hover a cell to view full text, left click to copy to clipboard, right click to open contents in new tab.
+	</header>
+
+	<div id="modelTable" class="ag-theme-alpine"></div>
+
+	<script>
+		const CLICK_TO_COPY_EMOJI = String.fromCodePoint(0x1F446) + String.fromCodePoint(0x1F4CB);
+		// read a jsonl file
+		async function fetchJsonlData(url) {
+			const response = await fetch(url);
+			const text = await response.text();
+			return text.trim().split('\n').map(line => JSON.parse(line));
+		}
+
+		async function fetchVersion() {
+			try {
+				const response = await fetch('model_table.version');
+				// load the contents of the file as json
+				return response.json().then(json => json.version);
+			} catch (error) {
+				console.error('Could not fetch version: ', error);
+				return 'unknown';
+			}
+		}
+
+		// fancy cell rendering -- hover/copy/open the data, make it emojis if its too long
+		function longCellRenderer(params) {
+			// Create the div element
+			var div = document.createElement('div');
+			div.title = params.value; // Set the title text to the full text
+			div.style.cursor = 'pointer'; // Ensure the cursor style is set
+			// If its too long, make it emojis
+			if (params.value !== null) {
+				if (params.value.length > 50) {
+					div.textContent = CLICK_TO_COPY_EMOJI;
+					div.style.cssText = 'font-size: 20px; display: flex; justify-content: center; align-items: center; background-color: #f4f4f4; border: 1px solid #d4d4d4; border-radius: 5px; height: 30px; width: 60px; cursor: pointer;';
+				}
+			}
+
+			// Add click event listener to copy text to the clipboard
+			div.onclick = function () {
+				navigator.clipboard.writeText(params.value).then(function () {
+					console.log('Successfully copied to clipboard');
+				}).catch(function (err) {
+					console.error('Could not copy text to clipboard: ', err);
+				});
+			};
+
+			// On right click, open a new plain text tab whose contents are the cell's value
+			div.oncontextmenu = function (event) {
+				event.preventDefault(); // Prevent the default context menu from appearing
+				const newWindowName = params.node.data['name.default_alias'] + ' : ' + params.colDef.headerName;
+				const newWindow = window.open('', newWindowName);
+				// Set the title of the page to the rows "name.default_alias" and the column's header
+				newWindow.document.write('<title>' + newWindowName + '</title>');
+				// Set the contents of the new window to the cell's value
+				newWindow.document.write('<pre>' + params.value + '</pre>');
+				// newWindow.document.close();
+				return false; // Prevent the default context menu from appearing
+			};
+
+			// Return the div as the cell's DOM
+			return div;
+		}
+
+		// huggingface model name cell renderer -- add a link to the model page
+		function hf_link_cell_renderer(params) {
+			// Create the div element
+			var div = document.createElement('div');
+			div.style.cursor = 'pointer'; // Ensure the cursor style is set
+			// If its too long, make it emojis
+			if (params.value !== null) {
+				// make a link with the text of the value, pointing to https://huggingface.co/{x}
+				// make it open in a new tab
+				div.innerHTML = `<a href="https://huggingface.co/${params.value}" target="_blank" rel="noopener noreferrer">${params.value}</a>`;
+				div.style.cssText = 'cursor: pointer;';
+			}
+			// Return the div as the cell's DOM
+			return div;
+		}
+
+		function value_formatter(params) {
+			if (params.value === null) {
+				return '';
+			}
+			return typeof params.value === 'object' ? JSON.stringify(params.value) : params.value;
+		}
+
+		async function setupGrid() {
+			const version = await fetchVersion();
+			document.querySelector('header').innerHTML = `Interactive Model table for <a href="https://github.com/neelnanda-io/TransformerLens">TransformerLens</a> v${version}.  Hover a cell with [${CLICK_TO_COPY_EMOJI}] to view full text, left click to copy to clipboard, right click to open contents in new tab.`;
+
+			// read the data
+			const rowData = await fetchJsonlData('model_table/data.jsonl');
+			const columnGroups = {};
+
+			// create the column definitions
+			Object.keys(rowData[0]).forEach(key => {
+				// if key ends with "__", then ignore it (raw tensor shapes)
+				if (key.endsWith('__')) {
+					return;
+				}
+				// treat dot separated keys as column groups
+				const keyParts = key.split('.');
+				if (keyParts.length === 2) {
+					// column in a group
+					const groupName = keyParts[0];
+					const fieldName = keyParts[1];
+					// init an empty group if it doesn't exist
+					if (!columnGroups[groupName]) {
+						columnGroups[groupName] = {
+							headerName: groupName,
+							children: [],
+						};
+					}
+					// add the column to the group
+					const columnDef = {
+						headerName: fieldName,
+						field: key,
+						// if it's an object, stringify it
+						valueFormatter: value_formatter,
+						// only show the first child if there are many (we modify this later in some special cases)
+						columnGroupShow: columnGroups[groupName].children.length < 1 ? null : 'open',
+						// hacky width calculation (doesn't work great)
+						width: Math.min(Math.max(130, key.length * 5), 500),
+						// numeric if it's a number
+						type: typeof rowData[0][key] === 'number' ? 'numericColumn' : 'textColumn',
+					};
+
+					// special renderer for tensor shapes
+					if (groupName === 'tensor_shapes') {
+						columnDef.cellRenderer = longCellRenderer;
+					}
+
+					// special renderer for huggingface model name
+					if (groupName === 'name' && fieldName === 'huggingface') {
+						columnDef.cellRenderer = hf_link_cell_renderer;
+					}
+
+					columnGroups[groupName].children.push(columnDef);
+				} else {
+					// solo column
+					const columnDef = {
+						headerName: key,
+						field: key,
+						valueFormatter: value_formatter,
+					};
+					// special renderer for full cfg
+					if (key === 'config') {
+						columnDef.cellRenderer = longCellRenderer;
+					}
+					columnGroups[key] = columnDef;
+				}
+			});
+
+			// special modifications
+			columnGroups['model_type'].width = 130;
+			columnGroups['config'].width = 100;
+			columnGroups['tensor_shapes'].width = 200;
+			// open these groups by default
+			columnGroups['tensor_shapes'].openByDefault = true;
+			columnGroups['cfg'].openByDefault = true;
+
+			const columnDefs = Object.values(columnGroups);
+
+			// create the grid
+			const gridOptions = {
+				columnDefs: columnDefs,
+				rowData: rowData,
+				rowSelection: 'multiple',
+				// customize pagination
+				pagination: true,
+				paginationPageSize: 500,
+				paginationPageSizeSelector: [10, 25, 50, 100, 500, 1000],
+				enableCellTextSelection: true,
+				enableBrowserTooltips: true,
+				// default column options
+				defaultColDef: {
+					resizable: true,
+					filter: true,
+					// always show the floating filter
+					floatingFilter: true,
+					// disable filter hamburger menu (for space)
+					menuTabs: [],
+				},
+				// we assume dots are groups, don't treat them as field notation
+				suppressFieldDotNotation: true,
+				// define column type to avoid warning
+				columnTypes: {
+					textColumn: {},
+				},
+				// this disables animations, but makes the horizontal scrolling not painfully slow
+				domLayout: 'print',
+			};
+
+			// create the grid
+			new agGrid.createGrid(document.getElementById('modelTable'), gridOptions);
+		}
+
+		setupGrid();
+	</script>
+</body>
+
+</html>
+
+
+---
+File: /docs/source/content/news/release-2.0.md
+---
+
+# TransformerLens 2.0
+
+I am very happy to announce TransformerLens now has a 2.0 release! If you have been using recent versions of TransformerLens, then the good news is that not much has changed at all. The primary motivation behind this jump is to transition the project to strictly following semantic versioning as described [here](https://semver.org/). At the last minute we did also remove the recently added HookedSAE, so if you had been using that, I would direct you to Joseph Bloom’s [SAELens](http://github.com/jbloomAus/SAELens). Bundled with this major version change are also a handful of internal modifications that only affect contributors.
+
+## First, an introduction
+
+My name is Bryce Meyer. I am a software engineer, with just a little under 15 years of professional experience with a wide range of expertise from embedded computing to API design. Within the last couple years I have gotten more and more involved in ML, and especially AI safety within the last nine months. At the end of March, I was chatting a bit with Joseph Bloom, and he asked me if I might be interested in taking on the role as primary maintainer of TransformerLens. I have been doing so on a part time basis since the beginning of April, and so far I am pretty happy with the progress that has been made.
+
+In this first month, with the help of the many kind contributors to TransformerLens we have managed to address every single pull request, many of which had been awaiting reply for quite some time. In total around 30 pull requests have been merged with contributions from around 20 people. Within those PRs a number of features were added, including, but not limited to support for Mixtral, LLaMA 3, 4-bit Quantized LLaMA, and HookedSAETransformer, a brand new class to splice sparse autoencoders into HookedTransformer.
+
+I have two primary immediate goals for my time as primary maintainer of this project. The first is to position TransformerLens in a way where it is approachable to as many people as possible, while also remaining powerful for people who are pushing the limits of the field. My second goal is to find ways to make the code base for this project easier to manage for the future, as the development and availability of LLMs continues to accelerate.
+
+I feel that this project has a massive amount of momentum at the moment, and I am hoping to carry that over into the future with new features. I have a software engineering background, not research, and I know I need to talk a lot with users to ensure the library is meeting their needs. I have personally spoken with around a dozen people in the community on their experience with TransformerLens, and what they may want to see happen in the future. If you have not spoken with me, but you would like to, please [make an appointment](https://calendly.com/bryce-c7e/30min). I am curious to hear from anyone who is using this tool, from absolute beginner to complete experts.
+
+## Adopting Semantic Versioning
+
+In the last month, a lot has changed with TransformerLens. Not only have a lot of changes been made to the code, but ideas of how the project will be managed are also evolving. The biggest change in the management of the project is the previously mentioned adoption of Semantic Versioning. Previously, the project had not been officially managed under Semantic Versioning, and there were instances where compatibility was not maintained through the 1.x branch. Going forward, API changes will be managed strictly, and in a way that maintains compatibility through major versions. If you are starting a project today using TransformerLens 2.0, then you can be rest assured that you will be able to upgrade your code all the way through the 2.x branch without worrying about needing to make changes to your code. For full details of how Semantic Versioning will affect TransformerLens, please see the appendix.
+
+## Deprecations
+
+There are right now two deprecations in the code base. The parameter `move_model` in `ActivationCache.to`, and the function `cache_all` in `hook_points`. To keep things simple for the change to semantic versioning, they will be remaining. However, if you are using them, then make sure to adapt your code right away. They will be removed in 3.0. Along with that, anything new that is marked deprecated in 2.x will also be removed when the next major version comes around.
+
+Whenever something new does become deprecated, it will also be prominently noted in the release notes to make sure these sorts of things do not slip by. In my previously mentioned scenario where a key was renamed, in the future a situation like this will be handled by changing the code to the new key, but then persisting the deprecated old key pointing at the new key. This will allow anyone relying on that key to continue to do so without interruption.
+
+However, I would still encourage everyone to periodically check release notes to make sure they are keeping an eye out for when things become deprecated. I don’t imagine it will happen often, but it will happen. Keeping an eye on it will save a lot of trouble in the future when moving from one major release to the next.
+
+## Roadmap
+
+There are three primary timeframes that I am approaching the current development plans of TransformerLens.
+
+### Immediate - within the next month
+
+At the moment, TransformerLens is in a state where all pull requests are being addressed quickly, but the issue tracker is still full of items that have not been addressed. The first thing to be done now is to go through all issues, categorize them, and address anything that is easy to address. Once that is done, both issues and pull requests will be up to date, and should remain that way going forward.
+
+### Mid-term - within the next 3 months
+
+Please note that the below is a draft roadmap. We are very happy to change our prioritization if user feedback surfaces other issues.
+
+#### Performance
+
+One of the first new items to be improved in TransformerLens is general performance. This will be achieved in a couple ways. The first involves diagnosing various areas in the code where memory leaks may be occurring. It seems like there are a number of places where references are not properly being released, thus causing garbage collection to not run correctly. If we can identify these places, and find proper ways to run garbage collection, we should be able to improve overall performance a lot, especially when dealing with larger models.
+
+The second performance task will be exploring ways to improve the ability to batch processes. I have already had code shared with myself that seems to work well at batching just about anything together in a very general way. There is also a separate volunteer working on going through said code and finding a good implementation to add to TransformerLens.
+
+#### Streamlining Adding New Models
+
+Improving the model submission process is another item to be addressed in the near future. It may be a good use of time to have some open discussions on this, but I do think this needs to be improved. In my discussions these last few weeks, I have found two primary problems involving models. The first is a general confusion among a good number of people on how they would go about adding a model to TransformerLens. The second problem is ensuring that the logits calculated within TransformerLens match HuggingFace. The goal is to solve both of these problems by systematizing the submission process (e.g. with good tutorials), and requiring that all new models submitted to the project have calculated logits to show that the models they are submitting match HuggingFace. This requirement at the moment would be quite a bit to ask for contributors. In order to alleviate that problem, we will build a little tool that will automatically calculate these logits, and spit out a table of said logits to be submitted with the PR. This would also give us the ability to snapshot said logits, store them in the repo, and periodically regenerate them to make sure cumulative changes to the code base have not affected these values.
+
+### Long-term - within the next year
+
+#### Model Testing
+
+Finding a way to create more robust tests with models integrated is a pretty big item that has been discussed. This is already implemented for the smaller models in each family, but is hard for model families like LLaMA where even the smallest is 7B. A lot of thoughts have been thrown around on this topic, but our best guess for a reasonable solution is to create an untrained small version of the model on HuggingFace (eg randomly initialized weights) and to verify that we can load that in. The resulting tests would not be accurate in the sense that using the full model would be, but it would allow testing for consistency on a smaller sample size of the larger model, and thus allow for the ability to test code against those more bite sized models. If we can find a successful way to go about handling this, then this could turn into a resource available for a lot of other projects to allow people to write efficient integration tests.
+
+#### Model Integration
+
+Making it easier for TransformerLens to handle a large range of models is another long term project that is at the moment a very hard problem to solve. Doing so, however, will be key to ensuring that the library is more future-proof. There have been many ideas put out of how to solve this, and this seems to be a topic that a lot of people have very strong opinions on. Most likely, there will need to be a handful of roundtable discussions on this to find the best solution. 
+
+One of the ideas is to have a generalized wrapper that can take in a model from HuggingFace. Another idea is to create a way to allow TransformerLens to have plugins, so addition of models can be handled outside of the main project, and people can publish compatibility with new models themselves without having to put them into the main project. Finally, there is an idea to keep the submission within TransformerLens as is, but to overhaul the way they are configured so that code can be shared more across models, and something like configuration composition can then be utilized to allow for common cases to be tested in isolation, and thus more rapidly allowing new settings to be accepted, and for people to attempt to configure models themselves without having to have the configuration itself in the repo. 
+
+It is very likely that none of these current ideas will end up being the solution, but we do need to come up with a solution. In my discussions with the community, one of the most common pain points was not having model compatibility. Up to now, it has been managed relatively well, but we still end up taking some time to accept new models, and there are a lot of models that TransformerLens does not support. This problem is only going to grow exponentially as the amount of available models grows as the whole field explodes.
+
+## Contributors
+
+This next section is only relevant to contributors, so if anyone is reading this who is only using TransformerLens as a tool, then you can skip this section. 
+
+### New Dev Branches
+
+There have been two new branches setup. One with the last release of 1.x, and another that will act as the current active development branch. The vast majority of pull requests should be made to the new dev branch. The reason for doing this is due to a potential mismatch between docs and the last release. Previously, all pull requests were put into the main branch, which caused the docs to be generated This meant that there were quite a few instances where the docs referenced features and functions that had not yet been released to people installing via pip. 
+
+From now on, dev will represent the most up to date version of the code with the vast majority of pull requests going to dev. The old main branch will only be updated when a release is ready to be sent out. Releases will be sent out when there are enough changes in dev to justify a release, and when bugs are found in the current release with PRs fixing those bugs going directly into main with an immediate release following.
+
+### Integration Tests
+
+The existing unit tests have been split out into two main groups. Those groups are now called integration tests, and, once again, unit tests. A lot of the existing unit tests were testing various pieces of the code base, and outside resources working together. Traditionally, unit tests should test everything in absolute isolation. That means that if the code is working with other parts of the code base, or outside resources, those pieces should be mocked out, and spied on to absolutely control all input and output of the functions, including side effects of said functions. The goal of this is to be able to be absolutely certain that the logic in the tested functions is being tested in absolute isolation, so that bugs can be entirely ruled out within that functions logic.
+
+A lot of the tests that would be categorized as integration, are still incredibly useful, but they are useful in a different way. To make both of them more useful in general, it makes sense to separate them. Unit tests are the first place to look when fixing a bug in a code base, but if they are dealing with outside resources, you cannot be absolutely certain that the bug does not originate from the outside resource. If the unit tests all test code in isolation, then if all of your unit tests pass, but your integration tests do not, then you can immediately rule out a whole bunch of places where bugs may be possible, and start looking in different places for bugs. Being able to separate the two test styles is going to make everyones lives a lot easier when it comes to maintaining the project.
+
+### Test Coverage
+ 
+The CI has recently been updated to publish a test coverage report. The overall coverage of the project should be improved. If anyone would like to begin improving the coverage, that could be a great way to start getting involved. There are quite a few parts of the code base that have no coverage. Reviewing that report, and finding a place to write a good, meaningful test is a great way to get started, and it should be easier than ever to do so. I have a handful of unit tests that I would like to have written that will improve coverage substantially, so if anyone would like to volunteer to take on some of those, let me know and I will be happy to point you in the right direction. 
+
+### Components Refactor
+
+This is the biggest change to the actual code base in this shift to 2.0. The whole components.py file has been removed in favor of a full module with individual files for each class that was previously in that file. The file was approaching 3000 lines with 18 distinct classes within it. There was no order to it either, since a lot of components were interdependent on each other, and it thus ended up being ordered from least dependent to most dependent. Now, everything has its own file, and every class is really easy to find in case of needing to reference anything. The refactor has been done in a way where no code needed to be changed anywhere else in the project, or outside the project. If you have been doing something like `import MLP from transformer_lens.components`, that will work, and continue to work exactly the same.
+
+## Conclusion
+
+Thank you very much for taking the time to read through this. I am very excited to be able to take on maintaining this project, and I am hoping to be able to work on this full time for at least the next year. I am not a researcher, and I am approaching all of this from a software engineering standpoint. This does give me a bit of an outsider's perspective on this in comparison to a lot of the people that have put in so much work to make this tool worth using. 
+
+I really think this tool is incredibly important, and it is enabling research that is going to have a huge impact on the world. My hope is that I can bring my expertise in software engineering to this project, so that the researchers using this tool can be more efficient, and so they can get to the more important tasks they need to complete. I will do my best to make that a reality.
+
+## Appendix
+
+### Semantic Versioning
+
+One of the main goals of semantic versioning (semver) is to communicate to people using the software if a new version is going to be completely compatible with an older version, or if they may need to check a change log to see if a feature they are using has changed. In the case of something like TransformerLens, the full API itself is what we base our version changes on. That includes classes, functions, parameters to functions, and data returned from said functions, including all exposed object properties or keys. When anything is added, then the minor version number gets a bump. When the API remains the same, but a bug has been fixed, the patch number gets a bump. Finally, when anything is removed whatsoever, then that requires a major version change. 
+
+With TransformerLens, the reason why it is necessary in this transition to bump to 2.0 is simply due to the fact that things from 1.0 have been removed along the 1.x branch, thus breaking the exposed API. In most cases, the breaking changes were simple things like exposed keys being renamed. I discovered a handful of these cases within the last month while bringing demos up from earlier versions of TransformerLens into more recent versions of 1.x. 
+
+I do not know exactly what the full extent of these changes were, and doing an exploration of this is probably not a great use of time. Regardless, the point stands that if you have a project using TransformerLens 1.0, you cannot reliably upgrade to 1.17 without possibly needing to change your code due to these exposed changes.The easiest thing to do in this situation while adopting semver is to simply bump the major version, and start fresh.
+
+Going forward, code that you write using TransformerLens will work, and will consume the same minimal API for all minor and patch releases in the 2.x branch.
+
+
+
+---
+File: /docs/source/content/citation.md
+---
+
+
+# Citation
+
+Please cite this library as:
+
+```BibTeX
+@misc{nanda2022transformerlens,
+    title = {TransformerLens},
+    author = {Neel Nanda and Joseph Bloom},
+    year = {2022},
+    howpublished = {\url{https://github.com/TransformerLensOrg/TransformerLens}},
+}
+```
+
+
+
+---
+File: /docs/source/content/contributing.md
+---
+
+# Contributing
+
+## Setup
+
+### DevContainer
+
+For a one-click setup of your development environment, this project includes a
+[DevContainer](https://containers.dev/). It can be used locally with [VS
+Code](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) or
+with [GitHub Codespaces](https://github.com/features/codespaces).
+
+### Manual Setup
+
+This project uses [Poetry](https://python-poetry.org/docs/#installation) for package management.
+Install as follows (this will also setup your virtual environment):
+
+```bash
+poetry config virtualenvs.in-project true
+poetry install --with dev,docs,jupyter
+```
+
+## Testing
+
+If adding a feature, please add unit tests for it. If you need a model, please use one of the ones
+that are cached by GitHub Actions (so that it runs quickly on the CD). These are `gpt2`,
+`attn-only-1l`, `attn-only-2l`, `attn-only-3l`, `attn-only-4l`, `tiny-stories-1M`. Note `gpt2` is
+quite slow (as we only have CPU actions) so the smaller models like `attn-only-1l` and
+`tiny-stories-1M` are preferred if possible.
+
+### Running the tests
+
+- Unit tests only via `make unit-test`
+- Acceptance tests only via `make acceptance-test`
+- Docstring tests only via `make docstring-test`
+- Notebook tests only via `make notebook-test`
+- Run all test suites mentioned `make test`
+
+## Formatting
+
+This project uses `pycln`, `isort` and `black` for formatting, pull requests are checked in github
+actions.
+
+- Format all files via `make format`
+- Only check the formatting via `make check-format`
+
+Note that `black` line length is set to 100 in `pyproject.toml` (instead of the default 88).
+
+## Documentation
+
+Please make sure to add thorough documentation for any features you add. You should do this directly
+in the docstring, and this will then automatically generate the API docs when merged into `main`.
+They will also be automatically checked with [pytest](https://docs.pytest.org/) (via
+[doctest](https://docs.python.org/3/library/doctest.html)).
+
+If you want to view your documentation changes, run `poetry run docs-hot-reload`. This will give you
+hot-reloading docs (they change in real time as you edit docstrings).
+
+### Docstring Style Guide
+
+We follow the Google Python Docstring Style for writing docstrings, with some added features from
+reStructuredText (reST).
+
+#### Sections and Order
+
+You should follow this order:
+
+```python
+"""Title In Title Case.
+
+A description of what the function/class does, including as much detail as is necessary to fully understand it.
+
+Warning:
+
+Any warnings to the user (e.g. common pitfalls).
+
+Examples:
+
+Include any examples here. They will be checked with doctest.
+
+  >>> print(1 + 2)
+  3
+
+Args:
+    param_without_type_signature:
+        Each description should be indented once more.
+    param_2:
+        Another example parameter.
+
+Returns:
+    Returns description without type signature.
+
+Raises:
+    Information about the error it may raise (if any).
+"""
+```
+
+#### Supported Sphinx Properties
+
+##### References to Other Functions/Classes
+
+You can reference other parts of the codebase using
+[cross-referencing](https://www.sphinx-doc.org/en/master/usage/domains/python.html#cross-referencing-python-objects)
+(noting that you can omit the full path if it is in the same file).
+
+```reStructuredText
+:mod:transformer_lens # Function or module
+
+:const:`transformer_lens.loading_from_pretrained.OFFICIAL_MODEL_NAMES`
+
+:class:`transformer_lens.HookedTransformer`
+
+:meth:`transformer_lens.HookedTransformer.from_pretrained`
+
+:attr:`transformer_lens.HookedTransformer.cfg`
+```
+
+##### Maths
+
+You can use LaTeX, but note that as you're placing this in python strings the backwards slash (`\`)
+must be repeated (i.e. `\\`). You can write LaTeX inline, or in "display mode".
+
+```reStructuredText
+:math:`(a + b)^2 = a^2 + 2ab + b^2`
+```
+
+```reStructuredText
+.. math::
+   :nowrap:
+
+   \\begin{eqnarray}
+      y    & = & ax^2 + bx + c \\
+      f(x) & = & x^2 + 2xy + y^2
+   \\end{eqnarray}
+```
+
+#### Markup
+
+- Italics - `*text*`
+- Bold - `**text**`
+- Code - ` ``code`` `
+- List items - `*item`
+- Numbered items - `1. Item`
+- Quotes - indent one level
+- External links = ``` `Link text <https://domain.invalid/>` ```
+
+
+
+---
+File: /docs/source/content/gallery.md
+---
+
+# Gallery
+
+Research done involving TransformerLens:
+
+- [Progress Measures for Grokking via Mechanistic
+  Interpretability](https://arxiv.org/abs/2301.05217) (ICLR Spotlight, 2023) by Neel Nanda, Lawrence
+  Chan, Tom Lieberum, Jess Smith, Jacob Steinhardt
+- [Finding Neurons in a Haystack: Case Studies with Sparse
+  Probing](https://arxiv.org/abs/2305.01610) by Wes Gurnee, Neel Nanda, Matthew Pauly, Katherine
+  Harvey, Dmitrii Troitskii, Dimitris Bertsimas
+- [Towards Automated Circuit Discovery for Mechanistic
+  Interpretability](https://arxiv.org/abs/2304.14997) by Arthur Conmy, Augustine N. Mavor-Parker,
+  Aengus Lynch, Stefan Heimersheim, Adrià Garriga-Alonso
+- [Actually, Othello-GPT Has A Linear Emergent World Representation](https://neelnanda.io/othello)
+  by Neel Nanda
+- [A circuit for Python docstrings in a 4-layer attention-only
+  transformer](https://www.alignmentforum.org/posts/u6KXXmKFbXfWzoAXn/a-circuit-for-python-docstrings-in-a-4-layer-attention-only)
+  by Stefan Heimersheim and Jett Janiak
+- [A Toy Model of Universality](https://arxiv.org/abs/2302.03025) (ICML, 2023) by Bilal Chughtai,
+  Lawrence Chan, Neel Nanda
+- [N2G: A Scalable Approach for Quantifying Interpretable Neuron Representations in Large Language
+  Models](https://openreview.net/forum?id=ZB6bK6MTYq) (2023, ICLR Workshop RTML) by Alex Foote, Neel
+  Nanda, Esben Kran, Ioannis Konstas, Fazl Barez
+- [Eliciting Latent Predictions from Transformers with the Tuned
+  Lens](https://arxiv.org/abs/2303.08112) by Nora Belrose, Zach Furman, Logan Smith, Danny Halawi,
+  Igor Ostrovsky, Lev McKinney, Stella Biderman, Jacob Steinhardt
+
+User contributed examples of the library being used in action:
+
+- [Induction Heads Phase Change
+  Replication](https://colab.research.google.com/github/ckkissane/induction-heads-transformer-lens/blob/main/Induction_Heads_Phase_Change.ipynb):
+  A partial replication of [In-Context Learning and Induction
+  Heads](https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html)
+  from Connor Kissane
+- [Decision Transformer
+  Interpretability](https://github.com/jbloomAus/DecisionTransformerInterpretability): A set of
+  scripts for training decision transformers which uses transformer lens to view intermediate
+  activations, perform attribution and ablations. A write up of the initial work can be found
+  [here](https://www.lesswrong.com/posts/bBuBDJBYHt39Q5zZy/decision-transformer-interpretability).
+
+
+---
+File: /docs/source/content/getting_started_mech_interp.md
+---
+
+# Getting Started in Mechanistic Interpretability
+
+Mechanistic interpretability is a very young and small field, and there are a _lot_ of open
+problems. This means there's both a lot of low-hanging fruit, and that the bar for entry is low - if
+you would like to help, please try working on one! The standard answer to "why has no one done this
+yet" is just that there aren't enough people! Key resources:
+
+- [A Guide to Getting Started in Mechanistic Interpretability](https://neelnanda.io/getting-started)
+- [ARENA Mechanistic Interpretability Tutorials](https://arena-ch1-transformers.streamlit.app/) from
+  Callum McDougall. A comprehensive practical introduction to mech interp, written in
+  TransformerLens - full of snippets to copy and they come with exercises and solutions! Notable
+  tutorials:
+  - [Coding GPT-2 from
+    scratch](https://arena-ch1-transformers.streamlit.app/[1.1]_Transformer_from_Scratch), with
+    accompanying video tutorial from me ([1](https://neelnanda.io/transformer-tutorial)
+    [2](https://neelnanda.io/transformer-tutorial-2)) - a good introduction to transformers
+  - [Introduction to Mech Interp and
+    TransformerLens](https://arena-ch1-transformers.streamlit.app/[1.2]_Intro_to_Mech_Interp): An
+    introduction to TransformerLens and mech interp via studying induction heads. Covers the
+    foundational concepts of the library
+  - [Indirect Object
+    Identification](https://arena-ch1-transformers.streamlit.app/[1.3]_Indirect_Object_Identification):
+    a replication of interpretability in the wild, that covers standard techniques in mech interp
+    such as [direct logit
+    attribution](https://dynalist.io/d/n2ZWtnoYHrU1s4vnFSAQ519J#z=disz2gTx-jooAcR0a5r8e7LZ),
+    [activation patching and path
+    patching](https://www.lesswrong.com/posts/xh85KbTFhbCz7taD4/how-to-think-about-activation-patching)
+- [Mech Interp Paper Reading List](https://neelnanda.io/paper-list)
+- [200 Concrete Open Problems in Mechanistic
+  Interpretability](https://neelnanda.io/concrete-open-problems)
+- [A Comprehensive Mechanistic Interpretability Explainer](https://neelnanda.io/glossary): To look
+  up all the jargon and unfamiliar terms you're going to come across!
+- [Neel Nanda's Youtube channel](https://www.youtube.com/channel/UCBMJ0D-omcRay8dh4QT0doQ): A range
+  of mech interp video content, including [paper
+  walkthroughs](https://www.youtube.com/watch?v=KV5gbOmHbjU&list=PL7m7hLIqA0hpsJYYhlt1WbHHgdfRLM2eY&index=1),
+  and [walkthroughs of doing
+  research](https://www.youtube.com/watch?v=yo4QvDn-vsU&list=PL7m7hLIqA0hr4dVOgjNwP2zjQGVHKeB7T)
+
+
+---
+File: /docs/source/content/getting_started.md
+---
+
+# Getting Started
+
+**Start with the [main demo](https://neelnanda.io/transformer-lens-demo) to learn how the library works, and the basic features**.
+
+To see what using it for exploratory analysis in practice looks like, check out [my notebook analysing Indirect Objection Identification](https://neelnanda.io/exploratory-analysis-demo) or [my recording of myself doing research](https://www.youtube.com/watch?v=yo4QvDn-vsU)!
+
+Mechanistic interpretability is a very young and small field, and there are a *lot* of open problems - if you would like to help, please try working on one! **Check out my [list of concrete open problems](https://docs.google.com/document/d/1WONBzNqfKIxERejrrPlQMyKqg7jSFW92x5UMXNrMdPo/edit) to figure out where to start.**. It begins with advice on skilling up, and key resources to check out. 
+
+If you're new to transformers, check out my [what is a transformer tutorial](https://neelnanda.io/transformer-tutorial) and [tutorial on coding GPT-2 from scratch](https://neelnanda.io/transformer-tutorial-2) (with [an accompanying template](https://neelnanda.io/transformer-template) to write one yourself!
+
+## Advice for Reading the Code
+
+One significant design decision made was to have a single transformer implementation that could support a range of subtly different GPT-style models. This has the upside of interpretability code just working for arbitrary models when you change the model name in `HookedTransformer.from_pretrained`! But it has the significant downside that the code implementing the model (in `HookedTransformer.py` and `components.py`) can be difficult to read. I recommend starting with my [Clean Transformer Demo](https://neelnanda.io/transformer-solution), which is a clean, minimal implementation of GPT-2 with the same internal architecture and activation names as HookedTransformer, but is significantly clearer and better documented.
+
+## Installation
+
+`pip install git+https://github.com/TransformerLensOrg/TransformerLens`
+
+Import the library with `import transformer_lens`
+
+(Note: This library used to be known as EasyTransformer, and some breaking changes have been made since the rename. If you need to use the old version with some legacy code, run `pip install git+https://github.com/TransformerLensOrg/TransformerLens@v1`.)
+
+## Huggingface Gated Access
+
+Some of the models available in TransformerLens require gated access to be used. Luckily TransformerLens provides a way to access those models via the configuration of an environmental variable. Simply configure your access token found [here](https://huggingface.co/settings/tokens) as `HF_TOKEN` in your environment.
+
+You will need to make sure you accept the agreements for any gated models, but once you do, the models will work with TransformerLens without issue. If you attempt to ues one of these models before you have accepted any related agreements, the console output will be very helpful and point you to the URL where you need to accept an agreement. As of 23/4/24, the current list of gated models supported by TransformerLens is as follows.
+
+* https://huggingface.co/mistralai/Mixtral-8x7B-v0.1
+* https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1
+* https://huggingface.co/mistralai/Mistral-7B-v0.1
+
+
+
+---
+File: /docs/source/content/special_cases.md
+---
+
+# Special Cases
+
+## Mixture of Experts error rates
+Due to the Top-K gating performed in the hidden layer of Mixture of Experts models, small errors can be amplified 
+greatly in cases where a different expert is selected, which leads to a higher than normal variance in the error rate
+of the final logits. In testing done on Mixtral running in half precision, the standard deviation of the absolute error 
+rate of the logits compared to those from the default model was found to be around 2e-3.
+
+There are two main ways to mitigate this:
+1. Disable preprocessing options by using `HookedTransformer.from_pretrained_no_processing` instead of `HookedTransformer.from_pretrained`
+2. Increase the precision of the data type used in the model
+
+
+
+---
+File: /docs/source/content/tutorials.md
+---
+
+# Tutorials
+
+- **Start with the [main demo](https://neelnanda.io/transformer-lens-demo) to learn how the library works, and the basic features**.
+
+## Where To Start
+
+- To see what using it for exploratory analysis in practice looks like, check out [my notebook analysing Indirect Objection Identification](https://neelnanda.io/exploratory-analysis-demo) or [my recording of myself doing research](https://www.youtube.com/watch?v=yo4QvDn-vsU)!
+
+- [What is a Transformer tutorial](https://neelnanda.io/transformer-tutorial)
+
+## Demos
+
+- [**Activation Patching in TransformerLens**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Activation_Patching_in_TL_Demo.ipynb) - Accompanies the [Exploratory Analysis Demo](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Exploratory Analysis Demo.ipynb). This demo explains how to use [Activation Patching](https://dynalist.io/d/n2ZWtnoYHrU1s4vnFSAQ519J#z=qeWBvs-R-taFfcCq-S_hgMqx) in TransformerLens, a mechanistic interpretability technique that uses causal intervention to identify which activations in a model matter for producing an output.
+
+- [**Attribution Patching**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Attribution_Patching_Demo.ipynb) - [Attribution Patching](https://www.neelnanda.io/mechanistic-interpretability/attribution-patching) is an incomplete project that uses gradients to take a linear approximation to activation patching. It's a good approximation when patching in small activations like the outputs of individual attention heads, and bad when patching in large activations like a residual stream.
+
+- [**Exploratory Analysis**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Exploratory_Analysis_Demo.ipynb) - Probably the best place to start, after the Main Demo. Demonstrates how to use TransformerLens to perform exploratory analysis - focuses less on rigor and more on getting a grasp of what's going on quickly. Uses a lot of useful interpretability techniques like logit attribution and activation patching. Steal liberally from this!
+
+- [**Grokking**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Grokking_Demo.ipynb) - "Grokking" is a phenomenon where a model can learn to memorise the training data (minimising training loss) but then, if trained for a lot longer, can learn to generalise, leading to a sharp decrease in test loss as well. This demo shows training a model on the task of modular addition, verifying that it groks, and doing analysis. The demo is light on explanation, so you'll probably want to pair it with [Neel's video series](https://www.youtube.com/watch?v=ob4vuiqG2Go) on the paper it's based on.
+
+- [**Head Detector**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Head_Detector_Demo.ipynb) - Shows how to use TransformerLens to automatically detect several common types of attention head, as well as create your own custom detection algorithms to find your own!
+
+- [**Interactive Neuroscope**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Interactive_Neuroscope.ipynb) - Very hacky demo, but this is a feature, not a bug. Shows how to quickly create useful web-based visualisations of data, even if you're not a professional front-end developer. This demo creates an interactive Neuroscope - a visualization of a neuron's activations on text that will dynamically update as you edit the text.
+
+- [**LLaMA**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/LLaMA.ipynb) - Converts Meta's LLaMA model (7B parameter version for now until multi-GPU support is added) to TransformerLens.
+
+- [**Main Demo**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Main_Demo.ipynb) - The main demo. This is where to start if you're new to TransformerLens. Shows a lot of great features for getting started, including available models, how to access model activations, and generally useful features you should know about.
+
+- [**No Position Experiment**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/No_Position_Experiment.ipynb) - The accompanying notebook to Neel's [real-time research video](https://www.youtube.com/watch?v=yo4QvDn-vsU). Trains a model with no positional embeddings to predict the previous token, and makes a start at analysing what's going on there!
+
+- [**Othello-GPT**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Othello_GPT.ipynb) - This is a demo notebook porting the weights of the Othello-GPT Model from the excellent [Emergent World Representations](https://arxiv.org/pdf/2210.13382.pdf) paper to TransformerLens. Neel's [sequence on investigating this](https://www.lesswrong.com/s/nhGNHyJHbrofpPbRG) is also well worth reading if you're interested in this topic!
+
+- [**SVD Interpreter Demo**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/SVD_Interpreter_demo.ipynb) - Based on the [Conjecture post](https://www.lesswrong.com/posts/mkbGjzxD8d8XqKHzA/the-singular-value-decompositions-of-transformer-weight#Directly_editing_SVD_representations) about how the singular value decompositions of transformer matrices are surprisingly interpretable, this demo shows how to use TransformerLens to reproduce this and investigate further.
+
+- [**Tracr to TransformerLens**](https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Tracr_to_Transformer_Lens_Demo.ipynb) - [Tracr](https://github.com/deepmind/tracr) is a cool new DeepMind tool that compiles a written program in [RASP](https://arxiv.org/abs/2106.06981) to transformer weights.This is a (hacky!) script to convert Tracr weights from the JAX form to a TransformerLens HookedTransformer in PyTorch.
+
+
+
+---
+File: /further_comments.md
+---
+
+# Further Details on Config Options
+## Shortformer Attention (`positional_embeddings_type == "shortformer"`)
+Shortformer style models are a variant on GPT-2 style positional embeddings, which do not add positional embeddings into the residual stream but instead add it in to the queries and keys immediately before multiplying by W_Q and W_K, and NOT having it around for the values or MLPs. It's otherwise the same - the positional embeddings are absolute, and are learned. The positional embeddings are NOT added to the residual stream in the standard way, and instead the queries and keys are calculated as W_Q(res_stream + pos_embed) and W_K(res_stream + pos_embed). The values and MLPs are calculated as W_V(res_stream) and W_MLP(res_stream) and so don't have access to positional information. This is otherwise the same as GPT-2 style positional embeddings. This is a variant on the Shortformer model from the paper [Shortformer: The Benefits of Shorter Sequences in Language Modeling](https://arxiv.org/abs/2012.15832). It's morally similar to rotary, which also only gives keys & queries access to positional info
+
+The original intention was to use this to do more efficient caching: caching is hard with absolute positional embeddings, since you can't translate the context window without recomputing the entire thing, but easier if the prior values and residual stream terms are the same. I've mostly implemented it because it makes it easier for models to form induction heads. I'm not entirely sure why, though hypothesise that it's because there's two ways for induction heads to form with positional embeddings in the residual stream and only one with shortformer style positional embeddings.
+    
+# Weight Processing
+## What is LayerNorm Folding? (`fold_ln`)
+[LayerNorm](https://wandb.ai/wandb_fc/LayerNorm/reports/Layer-Normalization-in-Pytorch-With-Examples---VmlldzoxMjk5MTk1) is a common regularisation technique used in transformers. Annoyingly, unlike eg BatchNorm, it can't be turned off at inference time, it's a meaningful change to the mathematical function implemented by the transformer. From an interpretability perspective, this is a headache! And it's easy to shoot yourself in the foot by naively ignoring it - eg, making the mistake of saying neuron_pre = resid_mid @ W_in, rather than LayerNorm(resid_mid) @ W_in. This mistake is an OK approximation, but by folding in the LayerNorm we can do much better!
+
+TLDR: If we have LayerNorm (weights w_ln and b_ln) followed by a linear layer (W+b), we can reduce the LayerNorm to LayerNormPre (just centering & normalising) and follow it by a linear layer with `W_eff = w[:, None] * W` (element-wise multiplication) and `b_eff = b + b_ln @ W`. This is computationally equivalent, and it never makes sense to think of W and w_ln as separate objects, so HookedTransformer handles it for you when loading pre-trained weights - set fold_ln = False when loading a state dict if you want to turn this off
+        
+Mathematically, LayerNorm is the following:
+```
+x1 = x0 - x0.mean()
+x2 = x1 / ((x1**2).mean()).sqrt()
+x3 = x2 * w
+x4 = x3 + b
+```
+        
+Apart from dividing by the norm, these are all pretty straightforwards operations from a linear algebra perspective. And from an interpretability perspective, if anything is linear, it's really easy and you can mostly ignore it (everything breaks up into sums, you can freely change basis, don't need to track interference between terms, etc) - the hard part is engaging with non-linearities!
+        
+A key thing to bear in mind is that EVERY time we read from the residual stream, we apply a LayerNorm - this gives us a lot of leverage to reason about it!
+        
+So let's translate this into linear algebra notation.
+        `x0` is a vector in `R^n`
+
+```
+x1 = x0 - x0.mean()
+   = x0 - (x0.mean()) * ones (broadcasting, ones=torch.ones(n))
+   = x0 - (x0 @ ones/sqrt(n)) * ones/sqrt(n).
+```
+
+ones has norm sqrt(n), so ones/sqrt(n) is the unit vector in the diagonal direction. We're just projecting x0 onto this (fixed) vector and subtracting that value off. Alternately, we're projecting onto the n-1 dimensional subspace orthogonal to ones.
+            
+Since LayerNorm is applied EVERY time we read from the stream, the model just never uses the ones direction of the residual stream, so it's essentially just decreasing d_model by one. We can simulate this by just centering all matrices writing to the residual stream.
+
+Why is removing this dimension useful? I have no idea! I'm not convinced it is...
+        
+```
+x2 = x1 / ((x1**2).mean()).sqrt() (Ignoring eps)
+   = (x1 / x1.norm()) * sqrt(n)
+```
+
+This is a projection onto the unit sphere (well, sphere of radius sqrt(n) - the norm of ones). This is fundamentally non-linear, eg doubling the input keeps the output exactly the same.
+
+This is by far the most irritating part of LayerNorm. I THINK it's mostly useful for numerical stability reasons and not used to do useful computation by the model, but I could easily be wrong! And interpreting a circuit containing LayerNorm sounds like a nightmare...
+
+In practice, you can mostly get aware with ignore this and treating the scaling factor as a constant, since it does apply across the entire residual stream for each token - this makes it a "global" property of the model's calculation, so for any specific question it hopefully doesn't matter that much. But when you're considering a sufficiently important circuit that it's a good fraction of the norm of the residual stream, it's probably worth thinking about.
+
+```
+x3 = x2 * w
+   = x2 @ W_ln
+```
+
+(`W_ln` is a diagonal matrix with the weights of the LayerNorm - this is equivalent to element-wise multiplication)
+This is really easy to deal with - we're about to be input to a linear layer, and can say `(x2 @ W_ln) @ W = x2 @ (W_ln @ W) = x2 @ W_eff` - we can just fold the LayerNorm weights into the linear layer weights.
+        
+`x4 = x3 + b` is similarly easy - `x4 @ W + B = x2 @ W_eff + B_eff`, where `W_eff = W_ln @ W` and `B_eff = B + b @ W`
+        
+This function is calculating `W_eff` and `B_eff` for each layer reading from the residual stream and replacing W and B with those.
+
+A final optimisation we can make is to **center the reading weights**. x2 has mean 0, which means it's orthogonal to the vector of all ones (`x2 @ ones = x2.sum() = len(x2) * x2.mean()`). This means that the component of `W_eff` that's parallel to `ones` is irrelevant, and we can set that to zero. In code, this means `W_eff -= W_eff.mean(dim=0, keepdim=True)`. This doesn't change the computation but makes things a bit simpler.
+        
+See this for more: https://transformer-circuits.pub/2021/framework/index.html#:~:text=Handling%20Layer%20Normalization
+
+## Centering Writing Weights (`center_writing_weight`)
+
+A related idea to folding layernorm - *every* component reading an input from the residual stream is preceded by a LayerNorm, which means that the mean of a residual stream vector (ie the component in the direction of all ones) never matters. This means we can remove the all ones component of weights and biases whose output *writes* to the residual stream. Mathematically, `W_writing -= W_writing.mean(dim=1, keepdim=True)`
+
+## Centering Unembed (`center_unembed`)
+
+The logits are fed into a softmax. Softmax is translation invariant (eg, adding 1 to every logit doesn't change the output), so we can simplify things by setting the mean of the logits to be zero. This is equivalent to setting the mean of every output vector of `W_U` to zero. In code, `W_U -= W_U.mean(dim=-1, keepdim=True)`
+
+## Fold Value Biases (`fold_value_biases`)
+
+Each attention head has a value bias. Values are averaged to create mixed values (`z`), weighted by the attention pattern, but as the bias is constant, its contribution to `z` is exactly the same. The output of a head is `z @ W_O`, and so the value bias just linearly adds to the output of the head. This means that the value bias of a head has *nothing to do with the head*, and is just a constant added to the attention layer outputs. We can take the sum across these and `b_O` to get an "effective bias" for the layer. In code, we set `b_V=0.` and `b_O = (b_V @ W_O).sum(dim=0) + b_O`
+
+<details><summary>Technical derivation</summary>
+
+`v = residual @ W_V[h] + broadcast_b_V[h]` for each head `h` (where `b_V` is broadcast up from shape `d_head` to shape `[position, d_head]`). And `z = pattern[h] @ v = pattern[h] @ residual @ W_V[h] + pattern[h] @ broadcast_b_V[h]`. Because `pattern[h]` is `[destination_position, source_position]` and `broadcast_b_V` is *constant* along the `(source_)position` dimension, we're basically just multiplying it by the sum of the pattern across the `source_position` dimension, which is just 1. So it remains exactly the same, and so is just brodcast across the destination positions. 
+</details>
+
+
+
+---
+File: /README.md
+---
+
+# TransformerLens
+
+<!-- Status Icons -->
+[![Pypi](https://img.shields.io/pypi/v/transformer-lens?color=blue)](https://pypi.org/project/transformer-lens/)
+![Pypi Total Downloads](https://img.shields.io/pepy/dt/transformer_lens?color=blue) ![PyPI -
+License](https://img.shields.io/pypi/l/transformer_lens?color=blue) [![Release
+CD](https://github.com/TransformerLensOrg/TransformerLens/actions/workflows/release.yml/badge.svg)](https://github.com/TransformerLensOrg/TransformerLens/actions/workflows/release.yml)
+[![Tests
+CD](https://github.com/TransformerLensOrg/TransformerLens/actions/workflows/checks.yml/badge.svg)](https://github.com/TransformerLensOrg/TransformerLens/actions/workflows/checks.yml)
+[![Docs
+CD](https://github.com/TransformerLensOrg/TransformerLens/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/TransformerLensOrg/TransformerLens/actions/workflows/pages/pages-build-deployment)
+
+A Library for Mechanistic Interpretability of Generative Language Models. Maintained by [Bryce Meyer](https://github.com/bryce13950) and created by [Neel Nanda](https://neelnanda.io/about)
+
+[![Read the Docs
+Here](https://img.shields.io/badge/-Read%20the%20Docs%20Here-blue?style=for-the-badge&logo=Read-the-Docs&logoColor=white&link=https://TransformerLensOrg.github.io/TransformerLens/)](https://TransformerLensOrg.github.io/TransformerLens/)
+
+This is a library for doing [mechanistic
+interpretability](https://distill.pub/2020/circuits/zoom-in/) of GPT-2 Style language models. The
+goal of mechanistic interpretability is to take a trained model and reverse engineer the algorithms
+the model learned during training from its weights.
+
+TransformerLens lets you load in 50+ different open source language models, and exposes the internal
+activations of the model to you. You can cache any internal activation in the model, and add in
+functions to edit, remove or replace these activations as the model runs.
+
+## Quick Start
+
+### Install
+
+```shell
+pip install transformer_lens
+```
+
+### Use
+
+```python
+import transformer_lens
+
+# Load a model (eg GPT-2 Small)
+model = transformer_lens.HookedTransformer.from_pretrained("gpt2-small")
+
+# Run the model and get logits and activations
+logits, activations = model.run_with_cache("Hello World")
+```
+
+## Key Tutorials
+
+* [Introduction to the Library and Mech
+  Interp](https://arena-chapter1-transformer-interp.streamlit.app/[1.2]_Intro_to_Mech_Interp)
+* [Demo of Main TransformerLens Features](https://neelnanda.io/transformer-lens-demo)
+
+## Gallery
+
+Research done involving TransformerLens:
+
+<!-- If you change this also change docs/source/content/gallery.md -->
+* [Progress Measures for Grokking via Mechanistic
+  Interpretability](https://arxiv.org/abs/2301.05217) (ICLR Spotlight, 2023) by Neel Nanda, Lawrence
+  Chan, Tom Lieberum, Jess Smith, Jacob Steinhardt
+* [Finding Neurons in a Haystack: Case Studies with Sparse
+  Probing](https://arxiv.org/abs/2305.01610) by Wes Gurnee, Neel Nanda, Matthew Pauly, Katherine
+  Harvey, Dmitrii Troitskii, Dimitris Bertsimas
+* [Towards Automated Circuit Discovery for Mechanistic
+  Interpretability](https://arxiv.org/abs/2304.14997) by Arthur Conmy, Augustine N. Mavor-Parker,
+  Aengus Lynch, Stefan Heimersheim, Adrià Garriga-Alonso
+* [Actually, Othello-GPT Has A Linear Emergent World Representation](https://neelnanda.io/othello)
+  by Neel Nanda
+* [A circuit for Python docstrings in a 4-layer attention-only
+  transformer](https://www.alignmentforum.org/posts/u6KXXmKFbXfWzoAXn/a-circuit-for-python-docstrings-in-a-4-layer-attention-only)
+  by Stefan Heimersheim and Jett Janiak
+* [A Toy Model of Universality](https://arxiv.org/abs/2302.03025) (ICML, 2023) by Bilal Chughtai,
+  Lawrence Chan, Neel Nanda
+* [N2G: A Scalable Approach for Quantifying Interpretable Neuron Representations in Large Language
+  Models](https://openreview.net/forum?id=ZB6bK6MTYq) (2023, ICLR Workshop RTML) by Alex Foote, Neel
+  Nanda, Esben Kran, Ioannis Konstas, Fazl Barez
+* [Eliciting Latent Predictions from Transformers with the Tuned
+  Lens](https://arxiv.org/abs/2303.08112) by Nora Belrose, Zach Furman, Logan Smith, Danny Halawi,
+  Igor Ostrovsky, Lev McKinney, Stella Biderman, Jacob Steinhardt
+
+User contributed examples of the library being used in action:
+
+* [Induction Heads Phase Change
+  Replication](https://colab.research.google.com/github/ckkissane/induction-heads-transformer-lens/blob/main/Induction_Heads_Phase_Change.ipynb):
+  A partial replication of [In-Context Learning and Induction
+  Heads](https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html)
+  from Connor Kissane
+* [Decision Transformer
+  Interpretability](https://github.com/jbloomAus/DecisionTransformerInterpretability): A set of
+  scripts for training decision transformers which uses transformer lens to view intermediate
+  activations, perform attribution and ablations. A write up of the initial work can be found
+  [here](https://www.lesswrong.com/posts/bBuBDJBYHt39Q5zZy/decision-transformer-interpretability).
+
+Check out [our demos folder](https://github.com/TransformerLensOrg/TransformerLens/tree/main/demos) for
+more examples of TransformerLens in practice
+
+## Getting Started in Mechanistic Interpretability
+
+Mechanistic interpretability is a very young and small field, and there are a _lot_ of open
+problems. This means there's both a lot of low-hanging fruit, and that the bar for entry is low - if
+you would like to help, please try working on one! The standard answer to "why has no one done this
+yet" is just that there aren't enough people! Key resources:
+
+* [A Guide to Getting Started in Mechanistic Interpretability](https://neelnanda.io/getting-started)
+* [ARENA Mechanistic Interpretability Tutorials](https://arena3-chapter1-transformer-interp.streamlit.app/) from
+  Callum McDougall. A comprehensive practical introduction to mech interp, written in
+  TransformerLens - full of snippets to copy and they come with exercises and solutions! Notable
+  tutorials:
+  * [Coding GPT-2 from
+    scratch](https://arena3-chapter1-transformer-interp.streamlit.app/[1.1]_Transformer_from_Scratch), with
+    accompanying video tutorial from me ([1](https://neelnanda.io/transformer-tutorial)
+    [2](https://neelnanda.io/transformer-tutorial-2)) - a good introduction to transformers
+  * [Introduction to Mech Interp and
+    TransformerLens](https://arena3-chapter1-transformer-interp.streamlit.app/[1.2]_Intro_to_Mech_Interp): An
+    introduction to TransformerLens and mech interp via studying induction heads. Covers the
+    foundational concepts of the library
+  * [Indirect Object
+    Identification](https://arena3-chapter1-transformer-interp.streamlit.app/[1.3]_Indirect_Object_Identification):
+    a replication of interpretability in the wild, that covers standard techniques in mech interp
+    such as [direct logit
+    attribution](https://dynalist.io/d/n2ZWtnoYHrU1s4vnFSAQ519J#z=disz2gTx-jooAcR0a5r8e7LZ),
+    [activation patching and path
+    patching](https://www.lesswrong.com/posts/xh85KbTFhbCz7taD4/how-to-think-about-activation-patching)
+* [Mech Interp Paper Reading List](https://neelnanda.io/paper-list)
+* [200 Concrete Open Problems in Mechanistic
+  Interpretability](https://neelnanda.io/concrete-open-problems)
+* [A Comprehensive Mechanistic Interpretability Explainer](https://neelnanda.io/glossary): To look
+  up all the jargon and unfamiliar terms you're going to come across!
+* [Neel Nanda's Youtube channel](https://www.youtube.com/channel/UCBMJ0D-omcRay8dh4QT0doQ): A range
+  of mech interp video content, including [paper
+  walkthroughs](https://www.youtube.com/watch?v=KV5gbOmHbjU&list=PL7m7hLIqA0hpsJYYhlt1WbHHgdfRLM2eY&index=1),
+  and [walkthroughs of doing
+  research](https://www.youtube.com/watch?v=yo4QvDn-vsU&list=PL7m7hLIqA0hr4dVOgjNwP2zjQGVHKeB7T)
+
+## Support & Community
+
+[![Contributing
+Guide](https://img.shields.io/badge/-Contributing%20Guide-blue?style=for-the-badge&logo=GitHub&logoColor=white)](https://TransformerLensOrg.github.io/TransformerLens/content/contributing.html)
+
+If you have issues, questions, feature requests or bug reports, please search the issues to check if
+it's already been answered, and if not please raise an issue!
+
+You're also welcome to join the open source mech interp community on
+[Slack](https://join.slack.com/t/opensourcemechanistic/shared_invite/zt-2n26nfoh1-TzMHrzyW6HiOsmCESxXtyw).
+Please use issues for concrete discussions about the package, and Slack for higher bandwidth
+discussions about eg supporting important new use cases, or if you want to make substantial
+contributions to the library and want a maintainer's opinion. We'd also love for you to come and
+share your projects on the Slack!
+
+| :exclamation:  HookedSAETransformer Removed   |
+|-----------------------------------------------|
+
+Hooked SAE has been removed from TransformerLens in version 2.0. The functionality is being moved to
+[SAELens](http://github.com/jbloomAus/SAELens). For more information on this release, please see the
+accompanying
+[announcement](https://transformerlensorg.github.io/TransformerLens/content/news/release-2.0.html)
+for details on what's new, and the future of TransformerLens.
+
+## Credits
+
+This library was created by **[Neel Nanda](https://neelnanda.io)** and is maintained by **[Bryce Meyer](https://github.com/bryce13950)**.
+
+The core features of TransformerLens were heavily inspired by the interface to [Anthropic's
+excellent Garcon tool](https://transformer-circuits.pub/2021/garcon/index.html). Credit to Nelson
+Elhage and Chris Olah for building Garcon and showing the value of good infrastructure for enabling
+exploratory research!
+
+### Creator's Note (Neel Nanda)
+
+I (Neel Nanda) used to work for the [Anthropic interpretability team](transformer-circuits.pub), and
+I wrote this library because after I left and tried doing independent research, I got extremely
+frustrated by the state of open source tooling. There's a lot of excellent infrastructure like
+HuggingFace and DeepSpeed to _use_ or _train_ models, but very little to dig into their internals
+and reverse engineer how they work. **This library tries to solve that**, and to make it easy to get
+into the field even if you don't work at an industry org with real infrastructure! One of the great
+things about mechanistic interpretability is that you don't need large models or tons of compute.
+There are lots of important open problems that can be solved with a small model in a Colab notebook!
+
+### Citation
+
+Please cite this library as:
+
+```BibTeX
+@misc{nanda2022transformerlens,
+    title = {TransformerLens},
+    author = {Neel Nanda and Joseph Bloom},
+    year = {2022},
+    howpublished = {\url{https://github.com/TransformerLensOrg/TransformerLens}},
+}
+```
+
