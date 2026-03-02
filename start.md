@@ -12,7 +12,7 @@ Your research topic is **evaluating activation oracles against sparse autoencode
 
 You have two weeks to complete this project. Plan your research depth accordingly. A good research project is not a single comparison — it involves multiple angles of investigation. 
 
-**Your work on the project will be judged based on your final codebase.** You should push your code frequently to Github using “git push”; your username and password are in .env. **Your final codebase must include a Markdown document at `FINAL_OUTPUT.md` that summarizes the key points and evidence from your results.** You should aim for your main writeup to be less than 5 pages, but you can include an appendix that is as long as you want to add extra charts, etc. to support your hypotheses. Read `context/output_format.md` for more information on the final output format. 
+**Your work on the project will be judged based on your final codebase.** You should push your code frequently to Github using “git push”; your username and password are in .env. **Your final codebase must include a Markdown document at `writeup/FINAL_OUTPUT.md` that summarizes the key points and evidence from your results.** You should aim for your main writeup to be less than 5 pages, but you can include an appendix that is as long as you want to add extra charts, etc. to support your hypotheses. Read `context/output_format.md` for more information on the final output format. 
 
 **YOU ARE RUNNING AUTONOMOUSLY AND SHOULD EXECUTE THIS PROJECT WITHOUT ANY USER INTERVENTION. DO NOT ASK FOR INPUT FROM THE USER, DO NOT ENTER PLAN MODE. If you ask for input, your question will not be answered and you will just be told to continue. You should make all project decisions on your own.**
 

@@ -1,6 +1,6 @@
 # Output Format
 
-Your final project will be evaluated based on your codebase and a writeup that should be saved in a markdown file called `FINAL_OUTPUT.md`. This is the most important deliverable for your project that will be judged by Neel Nanda, however he may also consider the rest of your codebase and research process. You should add any details, experiments, or information that you want Neel to consider in evaluating your work to the `FINAL_OUTPUT.md` file.
+Your final project will be evaluated based on your codebase and a writeup that should be saved in a markdown file called `writeup/FINAL_OUTPUT.md`. This is the most important deliverable for your project that will be judged by Neel Nanda, however he may also consider the rest of your codebase and research process. You should add any details, experiments, or information that you want Neel to consider in evaluating your work to the `writeup/FINAL_OUTPUT.md` file.
 
 Your output should be structured like an academic paper and include the following sections at minimum. Feel free to modify the format to better fit your specific project and address the relevant topics.
 - *Abstract*: A concise summary of the question, approach, key findings, and implications.
